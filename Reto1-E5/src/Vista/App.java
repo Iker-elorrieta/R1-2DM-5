@@ -52,6 +52,7 @@ public class App extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					
 					App frame = new App();
 					frame.setVisible(true);
 				} catch (Exception e) {
