@@ -3,6 +3,7 @@ package Vista;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -64,6 +65,9 @@ public class App extends JFrame {
 		JButton btnRegistro = new JButton("Registro");
 		btnRegistro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			/*	Registro r = new Registro();
+				r.setVisible(true); */
+				
 				Registro1 r = new Registro1();
 				r.setSize(950, 500);
 				r.setLocation(0, 0);

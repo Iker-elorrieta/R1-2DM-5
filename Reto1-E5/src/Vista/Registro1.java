@@ -14,13 +14,12 @@ import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
@@ -50,50 +49,48 @@ public class Registro1 extends JPanel {
 
 	
 		setBounds(100, 100, 881, 532);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		
 
 		
-		contentPane.setLayout(null);
 
 		JLabel lblRegistro = new JLabel("Registro");
 		lblRegistro.setFont(new Font("Arial Black", Font.BOLD, 28));
 		lblRegistro.setBounds(332, 11, 161, 76);
-		contentPane.add(lblRegistro);
+		add(lblRegistro);
 
 		JLabel lblNombre = new JLabel("Nombre");
 		lblNombre.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblNombre.setBounds(25, 100, 95, 25);
-		contentPane.add(lblNombre);
+		add(lblNombre);
 
 		JLabel lblApellido = new JLabel("Apellido");
 		lblApellido.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblApellido.setBounds(25, 182, 95, 17);
-		contentPane.add(lblApellido);
+		add(lblApellido);
 
 		JLabel lblUsuario = new JLabel("Usuario");
 		lblUsuario.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblUsuario.setBounds(25, 256, 95, 14);
-		contentPane.add(lblUsuario);
+		add(lblUsuario);
 
 		textFieldNombre = new JTextField();
 		textFieldNombre.setBounds(169, 105, 161, 20);
-		contentPane.add(textFieldNombre);
+		add(textFieldNombre);
 		textFieldNombre.setColumns(10);
 
 		textFieldApellido = new JTextField();
 		textFieldApellido.setBounds(169, 179, 161, 20);
-		contentPane.add(textFieldApellido);
+		add(textFieldApellido);
 		textFieldApellido.setColumns(10);
 
 		JLabel lblContraseña = new JLabel("Contraseña");
 		lblContraseña.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblContraseña.setBounds(25, 332, 122, 14);
-		contentPane.add(lblContraseña);
+		add(lblContraseña);
 
 		textFieldUsuario = new JTextField();
 		textFieldUsuario.setBounds(169, 253, 161, 20);
-		contentPane.add(textFieldUsuario);
+		add(textFieldUsuario);
 		textFieldUsuario.setColumns(10);
 
 		textFieldMail = new JTextField();
@@ -104,32 +101,32 @@ public class Registro1 extends JPanel {
 		JLabel lblMail = new JLabel("Mail");
 		lblMail.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblMail.setBounds(25, 410, 122, 17);
-		contentPane.add(lblMail);
+		add(lblMail);
 
 		JLabel lblRepetirContrasea = new JLabel("Repetir Contraseña");
 		lblRepetirContrasea.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblRepetirContrasea.setBounds(456, 332, 194, 14);
-		contentPane.add(lblRepetirContrasea);
+		add(lblRepetirContrasea);
 
 		JLabel lblFNacimiento = new JLabel("F. Nacimiento");
 		lblFNacimiento.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		lblFNacimiento.setBounds(456, 108, 194, 14);
-		contentPane.add(lblFNacimiento);
+		add(lblFNacimiento);
 
 		textFieldFNac = new JTextField();
 		textFieldFNac.setColumns(10);
 		textFieldFNac.setBounds(667, 105, 161, 20);
-		contentPane.add(textFieldFNac);
+		add(textFieldFNac);
 
 		JRadioButton rdbtnEntrenador = new JRadioButton("Entrenador");
 		rdbtnEntrenador.setFont(new Font("Arial", Font.BOLD, 17));
 		rdbtnEntrenador.setBounds(456, 180, 161, 23);
-		contentPane.add(rdbtnEntrenador);
+		add(rdbtnEntrenador);
 
 		JRadioButton rdbtnCliente = new JRadioButton("Cliente");
 		rdbtnCliente.setFont(new Font("Arial", Font.BOLD, 17));
 		rdbtnCliente.setBounds(456, 255, 161, 23);
-		contentPane.add(rdbtnCliente);
+		add(rdbtnCliente);
 
 		ButtonGroup grupo1 = new ButtonGroup();
 		grupo1.add(rdbtnEntrenador);
@@ -139,7 +136,7 @@ public class Registro1 extends JPanel {
 		lblError.setForeground(new Color(255, 0, 0));
 		lblError.setFont(new Font("Arial Black", Font.PLAIN, 14));
 		lblError.setBounds(412, 437, 390, 30);
-		contentPane.add(lblError);
+		add(lblError);
 
 		JButton btnRegistrarse = new JButton("Registrarse");
 		btnRegistrarse.addActionListener(new ActionListener() {
@@ -168,7 +165,7 @@ public class Registro1 extends JPanel {
 					lblError.setText("Las contraseñas no coinciden");
 				} else {
 					lblError.setText("Registro realizado correctamente");
-					contentPane.updateUI();
+					updateUI();
 					FileInputStream serviceAccount;
 					try {
 						serviceAccount = new FileInputStream("gymapp.json");
@@ -206,20 +203,20 @@ public class Registro1 extends JPanel {
 
 				}
 
-				contentPane.updateUI();
+				updateUI();
 			}
 		});
 		btnRegistrarse.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		btnRegistrarse.setBounds(537, 403, 152, 23);
-		contentPane.add(btnRegistrarse);
+		add(btnRegistrarse);
 
 		textFieldRepContraseña = new JPasswordField();
 		textFieldRepContraseña.setBounds(667, 332, 161, 20);
-		contentPane.add(textFieldRepContraseña);
+		add(textFieldRepContraseña);
 
 		textFieldContraseña = new JPasswordField();
 		textFieldContraseña.setBounds(169, 332, 161, 20);
-		contentPane.add(textFieldContraseña);
+		add(textFieldContraseña);
 
 	
 	}
