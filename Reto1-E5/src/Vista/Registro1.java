@@ -162,6 +162,7 @@ public class Registro1 extends JPanel {
 				} else {
 					lblError.setText("Registro realizado correctamente");
 					updateUI();
+				
 					FileInputStream serviceAccount;
 					try {
 						serviceAccount = new FileInputStream("gymapp.json");
@@ -213,6 +214,15 @@ public class Registro1 extends JPanel {
 		textFieldContraseña = new JPasswordField();
 		textFieldContraseña.setBounds(169, 332, 161, 20);
 		add(textFieldContraseña);
+		
+		JButton btnAtras = new JButton("Atras");
+		btnAtras.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
+		btnAtras.setBounds(822, 444, 89, 23);
+		add(btnAtras);
 
 	
 	}
