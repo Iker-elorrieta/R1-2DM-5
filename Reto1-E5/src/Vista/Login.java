@@ -1,42 +1,44 @@
 package Vista;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.util.List;
 
+import javax.swing.JButton;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
-
 public class Login extends JPanel {
 
+	private static final long serialVersionUID = 1L;
+	private JTextField textFieldUsuario;
+	private JPasswordField passwordField;
 	private static final String credArchivo = "gymapp.json";
 	private static final String proyectoID = "grupo5-gymapp";
 	
 	private static final String usuariosColl = "usuarios";
 	private static final String correoField = "correo";
 	private static final String contraField = "contrasena";
-	
-	private static final long serialVersionUID = 1L;
-	private JTextField textFieldUsuario;
-	private JPasswordField passwordField;
+
 
 	/**
-	 * Create the panel.
+	 * Create the frame.
 	 */
 	public Login() {
-		
-		
 		setLayout(null);
 		
 		JLabel lblLogin = new JLabel("Login");
@@ -62,6 +64,12 @@ public class Login extends JPanel {
 		passwordField = new JPasswordField();
 		passwordField.setBounds(220, 179, 126, 20);
 		add(passwordField);
+		
+		JLabel lblError = new JLabel("");
+		lblError.setForeground(new Color(255, 0, 0));
+		lblError.setFont(new Font("Arial Black", Font.PLAIN, 14));
+		lblError.setBounds(412, 437, 390, 30);
+		add(lblError);
 		
 		JButton btnLogin = new JButton("Iniciar Sesion");
 		btnLogin.addActionListener(new ActionListener() {
@@ -90,12 +98,27 @@ public class Login extends JPanel {
 						if (queryMail.contentEquals(correo) && queryPass.contentEquals(contrasena)) {
 							loginUser = usuarioSnapshot;
 							break;
+						}else if(!queryMail.contentEquals(correo) && !queryPass.contentEquals(contrasena)) {
+							lblError.setText("ambos campos incorrectos");
+						}else if(!queryMail.contentEquals(correo)) {
+							lblError.setText("Mail no válido");
+						}else if(!queryPass.contentEquals(contrasena)) {
+							lblError.setText("contraseña incorrecta");
 						}
 					}
 					
 					// comprobar resultado login
 					if (loginUser != null) {
 						System.out.println("login success");
+						
+						Perfil p = new Perfil(); // Pasar el contentPane al perfil
+						p.setSize(950, 500);
+						p.setLocation(0, 0);
+						
+						removeAll();
+						add(p, BorderLayout.CENTER);
+						revalidate();
+						repaint();
 					} else {
 						System.out.println("login failed");
 					}
@@ -105,16 +128,24 @@ public class Login extends JPanel {
 			}
 		});
 		btnLogin.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		btnLogin.setBounds(98, 255, 178, 23);
+		btnLogin.setBounds(94, 269, 197, 33);
 		add(btnLogin);
 		
-		JButton btnAtras = new JButton("Atras");
-		btnAtras.addActionListener(new ActionListener() {
+		JButton btnRegistro = new JButton("Registro");
+		btnRegistro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Registro1 r = new Registro1();
+				r.setSize(950, 500);
+				r.setLocation(0, 0);
 				
+				removeAll();
+				add(r, BorderLayout.CENTER);
+				revalidate();
+				repaint();
 			}
 		});
-		btnAtras.setBounds(822, 444, 89, 23);
-		add(btnAtras);
+		btnRegistro.setBounds(367, 325, 89, 23);
+		add(btnRegistro);
 	}
+
 }

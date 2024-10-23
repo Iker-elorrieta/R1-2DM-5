@@ -1,5 +1,6 @@
 package Vista;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -177,7 +178,7 @@ public class Registro1 extends JPanel {
 						usuario1.put("nombre", nombre);
 						usuario1.put("apellido", apellido);
 						usuario1.put("contrasena", Contraseña);
-						usuario1.put("mail", mail);
+						usuario1.put("correo", mail);
 						if (rdbtnCliente.isSelected()) {
 							usuario1.put("nivel", 0);
 						}
@@ -218,7 +219,14 @@ public class Registro1 extends JPanel {
 		JButton btnAtras = new JButton("Atras");
 		btnAtras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Login r = new Login();
+				r.setSize(950, 500);
+				r.setLocation(0, 0);
 				
+				removeAll();
+				add(r, BorderLayout.CENTER);
+				revalidate();
+				repaint();
 			}
 		});
 		btnAtras.setBounds(822, 444, 89, 23);
