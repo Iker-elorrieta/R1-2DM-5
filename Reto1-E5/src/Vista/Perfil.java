@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import java.awt.Font;
 
 public class Perfil extends JPanel {
 
@@ -20,7 +21,8 @@ public class Perfil extends JPanel {
 		setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("Perfil");
-		lblNewLabel.setBounds(428, 249, 46, 14);
+		lblNewLabel.setFont(new Font("Arial Black", Font.PLAIN, 28));
+		lblNewLabel.setBounds(10, 11, 135, 84);
 		add(lblNewLabel);
 
 		JButton btnAtras = new JButton("Atras");
