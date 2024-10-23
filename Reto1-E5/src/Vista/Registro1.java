@@ -32,7 +32,7 @@ public class Registro1 extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JPanel contentPane;
+	
 	private JTextField textFieldNombre;
 	private JTextField textFieldApellido;
 	private JTextField textFieldUsuario;
@@ -47,11 +47,7 @@ public class Registro1 extends JPanel {
 
 		Metodos metodos = new Metodos();
 
-	
-		setBounds(100, 100, 881, 532);
-		
-
-		
+		setLayout(null);
 
 		JLabel lblRegistro = new JLabel("Registro");
 		lblRegistro.setFont(new Font("Arial Black", Font.BOLD, 28));
@@ -95,7 +91,7 @@ public class Registro1 extends JPanel {
 
 		textFieldMail = new JTextField();
 		textFieldMail.setBounds(169, 407, 161, 20);
-		contentPane.add(textFieldMail);
+		add(textFieldMail);
 		textFieldMail.setColumns(10);
 
 		JLabel lblMail = new JLabel("Mail");
