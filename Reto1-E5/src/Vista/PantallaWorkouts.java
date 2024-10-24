@@ -10,9 +10,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.awt.Desktop;
 
-public class PantallaWorkouts {
+public class PantallaWorkouts extends JFrame{
 
-	private JFrame frame;
+	private static final long serialVersionUID = 1L;
+	
 	private JPanel panelWorkouts;
     private JComboBox<Object> nivelComboBox;
 
@@ -23,7 +24,7 @@ public class PantallaWorkouts {
         java.awt.EventQueue.invokeLater(() -> {
             try {
                 PantallaWorkouts window = new PantallaWorkouts();
-                window.frame.setVisible(true);
+                window.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -41,27 +42,27 @@ public class PantallaWorkouts {
 	 * Initialize the contents of the frame.
 	 */
 	 private void initialize() {
-	        frame = new JFrame();
-	        frame.setBounds(100, 100, 600, 400);
-	        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	        frame.getContentPane().setLayout(null);
+	        
+	        setBounds(100, 100, 600, 400);
+	        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	        setLayout(null);
 
 	        panelWorkouts = new JPanel();
 	        panelWorkouts.setLayout(new BoxLayout(panelWorkouts, BoxLayout.Y_AXIS));
 	        
 	        JScrollPane scrollPane = new JScrollPane(panelWorkouts);
 	        scrollPane.setBounds(30, 30, 500, 250);
-	        frame.getContentPane().add(scrollPane);
+	        getContentPane().add(scrollPane);
 
 	        nivelComboBox = new JComboBox<>();
 	        nivelComboBox.addItem("Todos");
 	        nivelComboBox.setBounds(127, 291, 85, 25);
-	        frame.getContentPane().add(nivelComboBox);
+	        getContentPane().add(nivelComboBox);
 
 	        JButton btnVerWorkouts = new JButton("Ver Workouts");
 	        btnVerWorkouts.addActionListener(e -> mostrarDatosWorkouts());
 	        btnVerWorkouts.setBounds(222, 290, 150, 25);
-	        frame.getContentPane().add(btnVerWorkouts);
+	        getContentPane().add(btnVerWorkouts);
 	        
 	        JButton btnVerHistorial = new JButton("Ver Historial");
 	        btnVerHistorial.setBounds(382, 291, 148, 25);
@@ -71,10 +72,10 @@ public class PantallaWorkouts {
 	        lblFiltrar.setBounds(30, 296, 100, 14);
 	        frame.getContentPane().add(lblFiltrar);
 
-	        cargarNiveles();
+	        cargarNiveles(nivelComboBox);
 	    }
 
-	    private void cargarNiveles() {
+	    private void cargarNiveles(JComboBox<Object> nivelComboBox2) {
 	        try {
 	            Workouts workouts = new Workouts();
 	            ArrayList<Integer> niveles = workouts.mObtenerNiveles();
@@ -84,7 +85,7 @@ public class PantallaWorkouts {
 	            }
 	        } catch (IOException e) {
 	            e.printStackTrace();
-	            JOptionPane.showMessageDialog(frame, "Error al obtener los niveles: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+	            JOptionPane.showMessageDialog(panelWorkouts, "Error al obtener los niveles: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	        }
 	    }
 
