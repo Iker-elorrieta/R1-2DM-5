@@ -8,6 +8,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import Controlador.Metodos;
+import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 
 public class Workouts extends JPanel {
 	Metodos metodos = new Metodos();
@@ -45,6 +48,22 @@ public class Workouts extends JPanel {
         add(lblFiltrar);
 
         metodos.cargarNiveles(nivelComboBox, panelWorkouts);
+        
+        JButton btnAtras = new JButton("Atras");
+        btnAtras.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		Perfil p = new Perfil(); // Pasar el contentPane al perfil
+				p.setSize(950, 500);
+				p.setLocation(0, 0);
+				
+				removeAll();
+				add(p, BorderLayout.CENTER);
+				revalidate();
+				repaint();
+        	}
+        });
+        btnAtras.setBounds(540, 159, 89, 23);
+        add(btnAtras);
     
 	}
 
