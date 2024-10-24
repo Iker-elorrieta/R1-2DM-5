@@ -40,6 +40,22 @@ public class Perfil extends JPanel {
 		});
 		btnAtras.setBounds(822, 444, 89, 23);
 		add(btnAtras);
+		
+		JButton btnWorkouts = new JButton("Ver Workouts");
+		btnWorkouts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Workouts r = new Workouts();
+				r.setSize(950, 500);
+				r.setLocation(0, 0);
+				
+				removeAll();
+				add(r, BorderLayout.CENTER);
+				revalidate();
+				repaint();
+			}
+		});
+		btnWorkouts.setFont(new Font("Arial Black", Font.PLAIN, 17));
+		btnWorkouts.setBounds(525, 49, 182, 46);
+		add(btnWorkouts);
 	}
-
 }

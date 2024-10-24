@@ -100,33 +100,6 @@ public class Workouts {
         return listaWorkouts;
     }
 
-
-    
-    public ArrayList<String> mObtenerEjerciciosIDs() throws IOException {
-        ArrayList<String> listaIDs = new ArrayList<>();
-        Conexion conexion = new Conexion();
-        Firestore db = conexion.conectar();
-
-        try {
-            String workoutId = this.nombre.toLowerCase(); // utilizo .toLowerCase porque cogia el nombre en mayusculas.
-            
-            CollectionReference ejerciciosRef = db.collection("workouts").document(workoutId).collection("ejercicios");
-            ApiFuture<QuerySnapshot> ejerciciosSnapshot = ejerciciosRef.get();
-            List<QueryDocumentSnapshot> ejerciciosDocs = ejerciciosSnapshot.get().getDocuments();
-
-            for (QueryDocumentSnapshot ejercicio : ejerciciosDocs) {
-                listaIDs.add(ejercicio.getId());
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosIDs");
-            e.printStackTrace();
-        } finally {
-            conexion.cerrar(db);
-        }
-
-        return listaIDs;
-    }
-
     public ArrayList<Integer> mObtenerNiveles() throws IOException {
         ArrayList<Integer> listaNiveles = new ArrayList<>();
         Conexion conexion = new Conexion();
