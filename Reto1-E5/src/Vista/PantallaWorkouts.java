@@ -2,7 +2,6 @@ package Vista;
 
 import javax.swing.*;
 import Modelo.Workouts;
-import Vista.PantallaEjercicios;
 import Vista.PantallaWorkouts;
 
 import java.io.IOException;

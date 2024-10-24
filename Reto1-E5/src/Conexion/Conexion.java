@@ -13,7 +13,7 @@ public class Conexion {
 	private static String nombreJSON = "gymapp.json";
 	private static String projectID = "grupo5-gymapp";
 
-	public static Firestore conectar() throws IOException {
+	public Firestore conectar() throws IOException {
 		FileInputStream serviceAccount;
 		Firestore fs = null;
 		try {
