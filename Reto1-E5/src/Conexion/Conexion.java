@@ -29,6 +29,16 @@ public class Conexion {
 
 		return fs;
 	}
+	
+	public void cerrar(Firestore fs) {
+	    if (fs != null) {
+	        try {
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	    }
+	}
 
 
 
