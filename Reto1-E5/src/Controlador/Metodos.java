@@ -30,5 +30,5 @@ public class Metodos {
 		Matcher matcher = pattern.matcher(email);
 		return matcher.matches();
 	}
-	
+
 }
