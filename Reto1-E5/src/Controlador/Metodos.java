@@ -10,7 +10,7 @@ public class Metodos {
 		boolean resultado = true;
 		if(repContraseña.intern() != contraseña.intern()) {
 			resultado = false;
-		}
+		} 
 		return resultado;
 	}
 
