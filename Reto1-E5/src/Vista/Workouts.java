@@ -17,7 +17,7 @@ public class Workouts extends JPanel {
     private static final long serialVersionUID = 1L;
     public JPanel panelWorkouts;
 
-    public Workouts() {
+    public Workouts(String user) {
         setLayout(null);
         panelWorkouts = new JPanel();
         panelWorkouts.setLayout(new BoxLayout(panelWorkouts, BoxLayout.Y_AXIS));
@@ -50,7 +50,7 @@ public class Workouts extends JPanel {
         JButton btnAtras = new JButton("Atras");
         btnAtras.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Perfil p = new Perfil();
+                Perfil p = new Perfil(user);
                 p.setSize(950, 500);
                 p.setLocation(0, 0);
 

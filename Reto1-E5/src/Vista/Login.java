@@ -33,7 +33,7 @@ public class Login extends JPanel {
 	private static final String usuariosColl = "usuarios";
 	private static final String correoField = "correo";
 	private static final String contraField = "contrasena";
-
+	public String user = "user";
 
 	/**
 	 * Create the frame.
@@ -74,7 +74,7 @@ public class Login extends JPanel {
 		JButton btnLogin = new JButton("Iniciar Sesion");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				String queryMail = "";
 				String correo = textFieldUsuario.getText();
 				char[] arrayContra = passwordField.getPassword();
 				String contrasena = new String(arrayContra);
@@ -92,11 +92,12 @@ public class Login extends JPanel {
 					// obtener coleccion de usuarios
 					List<QueryDocumentSnapshot> usuarios = db.collection(usuariosColl).get().get().getDocuments();
 					for (QueryDocumentSnapshot usuarioSnapshot : usuarios) {
-						String queryMail = usuarioSnapshot.getString(correoField);
+						queryMail = usuarioSnapshot.getString(correoField);
 						String queryPass = usuarioSnapshot.getString(contraField);
 						
 						if (queryMail.contentEquals(correo) && queryPass.contentEquals(contrasena)) {
 							loginUser = usuarioSnapshot;
+							user = usuarioSnapshot.getId();
 							break;
 						}else if(!queryMail.contentEquals(correo) && !queryPass.contentEquals(contrasena)) {
 							lblError.setText("ambos campos incorrectos");
@@ -111,7 +112,7 @@ public class Login extends JPanel {
 					if (loginUser != null) {
 						System.out.println("login success");
 						
-						Perfil p = new Perfil(); // Pasar el contentPane al perfil
+						Perfil p = new Perfil(user); // Pasar el contentPane al perfil
 						p.setSize(950, 500);
 						p.setLocation(0, 0);
 						

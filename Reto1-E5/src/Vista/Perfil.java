@@ -6,21 +6,23 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import java.awt.Font;
 
 public class Perfil extends JPanel {
-
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Create the panel.
+	 * @param queryMail 
 	 */
-	public Perfil() {
+	public Perfil(String user) {
 		setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Perfil");
+		JLabel lblNewLabel = new JLabel(user);
 		lblNewLabel.setFont(new Font("Arial Black", Font.PLAIN, 28));
 		lblNewLabel.setBounds(10, 11, 135, 84);
 		add(lblNewLabel);
@@ -44,7 +46,7 @@ public class Perfil extends JPanel {
 		JButton btnWorkouts = new JButton("Ver Workouts");
 		btnWorkouts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Workouts r = new Workouts();
+				Workouts r = new Workouts(user);
 				r.setSize(950, 500);
 				r.setLocation(0, 0);
 				
