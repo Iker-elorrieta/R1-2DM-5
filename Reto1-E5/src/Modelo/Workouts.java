@@ -1,6 +1,7 @@
 package Modelo;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -13,7 +14,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import Conexion.Conexion;
 
-public class Workouts {
+public class Workouts implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
     private String video;
     private String nombre;

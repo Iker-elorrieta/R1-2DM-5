@@ -1,6 +1,7 @@
 package Controlador;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -268,6 +269,29 @@ public class Metodos {
         }
 
         return listaNiveles;
+    }
+    
+    public void verificarYCrearArchivo() {
+        File carpeta = new File("Archivos");
+        if (!carpeta.exists()) {
+            if (carpeta.mkdirs()) {
+                System.out.println("Carpeta 'Archivos' creada.");
+            } else {
+                System.out.println("No se pudo crear la carpeta 'Archivos'.");
+            }
+        }
+
+        File archivo = new File(carpeta, "usuarios.dat");
+        try {
+            if (archivo.createNewFile()) {
+                System.out.println("Archivo creado: " + archivo.getName());
+            } else {
+                System.out.println("El archivo ya existe.");
+            }
+        } catch (IOException e) {
+            System.out.println("Ocurrió un error al crear el archivo.");
+            e.printStackTrace();
+        }
     }
     
     

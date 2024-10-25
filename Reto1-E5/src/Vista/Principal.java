@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import Modelo.CrearBackups;
 
 public class Principal extends JFrame {
 
@@ -19,10 +18,6 @@ public class Principal extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    CrearBackups backups = new CrearBackups();
-                    backups.verificarYCrearArchivo();
-                    backups.bajarDatosUsuarios();
-
                     Principal frame = new Principal();
                     frame.setVisible(true);
                 } catch (Exception e) {
