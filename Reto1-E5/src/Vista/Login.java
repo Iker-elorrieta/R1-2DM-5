@@ -150,5 +150,6 @@ public class Login extends JPanel {
 		btnRegistro.setBounds(367, 325, 89, 23);
 		add(btnRegistro);
 	}
+	
 
 }
