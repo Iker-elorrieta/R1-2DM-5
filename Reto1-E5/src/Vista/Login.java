@@ -37,7 +37,7 @@ public class Login extends JPanel {
 	private static final String usuariosColl = "usuarios";
 	private static final String correoField = "correo";
 	private static final String contraField = "contrasena";
-
+	public String user = "";
 
 	/**
 	 * Create the frame.
@@ -110,6 +110,7 @@ public class Login extends JPanel {
 						
 						if (queryMail.contentEquals(correo) && queryPass.contentEquals(contrasena)) {
 							loginUser = usuarioSnapshot;
+							user = usuarioSnapshot.getId();
 							break;
 						}else if(!queryMail.contentEquals(correo) && !queryPass.contentEquals(contrasena)) {
 							lblError.setText("Introduce los datos correctamente");
@@ -124,8 +125,10 @@ public class Login extends JPanel {
 					if (loginUser != null) {
 						System.out.println("login success");
 						
+						
+						
 						CrearBackups.main(null);
-						Perfil p = new Perfil(); // Pasar el contentPane al perfil
+						Perfil p = new Perfil(user); // Pasar el contentPane al perfil
 						p.setSize(950, 500);
 						p.setLocation(0, 0);
 						
