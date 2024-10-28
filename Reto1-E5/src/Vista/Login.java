@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileInputStream;
@@ -15,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.ImageIcon;
 
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -43,6 +45,15 @@ public class Login extends JPanel {
 	public Login() {
 		setLayout(null);
 		
+		ImageIcon iconoOriginal = new ImageIcon("./img/gymapp.png");
+        Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(300, 250, Image.SCALE_SMOOTH);
+        ImageIcon iconoEscalado = new ImageIcon(imagenEscalada);
+        
+        JLabel lblImagen = new JLabel(iconoEscalado);
+        lblImagen.setBounds(167, 41, 295, 241);
+        add(lblImagen);
+		
+		
 		JLabel lblLogin = new JLabel("Login");
 		lblLogin.setFont(new Font("Arial Black", Font.BOLD, 28));
 		lblLogin.setBounds(32, 11, 314, 66);
@@ -50,27 +61,27 @@ public class Login extends JPanel {
 		
 		JLabel lblMail = new JLabel("Email");
 		lblMail.setFont(new Font("Arial Black", Font.BOLD, 17));
-		lblMail.setBounds(32, 103, 103, 14);
+		lblMail.setBounds(157, 292, 103, 14);
 		add(lblMail);
 		
 		textFieldUsuario = new JTextField();
-		textFieldUsuario.setBounds(220, 103, 126, 20);
+		textFieldUsuario.setBounds(335, 293, 141, 20);
 		add(textFieldUsuario);
 		textFieldUsuario.setColumns(10);
 		
 		JLabel lblContraseña = new JLabel("Contraseña");
 		lblContraseña.setFont(new Font("Arial Black", Font.BOLD, 17));
-		lblContraseña.setBounds(32, 178, 165, 17);
+		lblContraseña.setBounds(157, 344, 165, 17);
 		add(lblContraseña);
 		
 		passwordField = new JPasswordField();
-		passwordField.setBounds(220, 179, 126, 20);
+		passwordField.setBounds(335, 346, 141, 20);
 		add(passwordField);
 		
 		JLabel lblError = new JLabel("");
 		lblError.setForeground(new Color(255, 0, 0));
 		lblError.setFont(new Font("Arial Black", Font.PLAIN, 14));
-		lblError.setBounds(412, 437, 390, 30);
+		lblError.setBounds(181, 379, 281, 30);
 		add(lblError);
 		
 		JButton btnLogin = new JButton("Iniciar Sesion");
@@ -101,7 +112,7 @@ public class Login extends JPanel {
 							loginUser = usuarioSnapshot;
 							break;
 						}else if(!queryMail.contentEquals(correo) && !queryPass.contentEquals(contrasena)) {
-							lblError.setText("ambos campos incorrectos");
+							lblError.setText("Introduce los datos correctamente");
 						}else if(!queryMail.contentEquals(correo)) {
 							lblError.setText("Mail no válido");
 						}else if(!queryPass.contentEquals(contrasena)) {
@@ -131,10 +142,11 @@ public class Login extends JPanel {
 			}
 		});
 		btnLogin.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		btnLogin.setBounds(94, 269, 197, 33);
+		btnLogin.setBounds(95, 419, 197, 33);
 		add(btnLogin);
 		
 		JButton btnRegistro = new JButton("Registro");
+		btnRegistro.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		btnRegistro.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Registro1 r = new Registro1();
@@ -147,7 +159,7 @@ public class Login extends JPanel {
 				repaint();
 			}
 		});
-		btnRegistro.setBounds(367, 325, 89, 23);
+		btnRegistro.setBounds(335, 419, 197, 33);
 		add(btnRegistro);
 	}
 	

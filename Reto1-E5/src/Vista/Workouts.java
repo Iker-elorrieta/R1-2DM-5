@@ -28,20 +28,20 @@ public class Workouts extends JPanel {
 
         nivelComboBox = new JComboBox<>();
         nivelComboBox.addItem("Todos");
-        nivelComboBox.setBounds(127, 291, 85, 25);
+        nivelComboBox.setBounds(125, 314, 85, 25);
         add(nivelComboBox);
 
         JButton btnVerWorkouts = new JButton("Ver Workouts");
         btnVerWorkouts.addActionListener(e -> metodos.mostrarDatosWorkouts(nivelComboBox, panelWorkouts));
-        btnVerWorkouts.setBounds(222, 290, 150, 25);
+        btnVerWorkouts.setBounds(222, 314, 150, 25);
         add(btnVerWorkouts);
         
         JButton btnVerHistorial = new JButton("Ver Historial");
-        btnVerHistorial.setBounds(382, 291, 148, 25);
+        btnVerHistorial.setBounds(382, 314, 148, 25);
         add(btnVerHistorial);
         
         JLabel lblFiltrar = new JLabel("Filtrar por nivel: ");
-        lblFiltrar.setBounds(30, 296, 100, 14);
+        lblFiltrar.setBounds(30, 319, 100, 14);
         add(lblFiltrar);
         
 
@@ -60,7 +60,23 @@ public class Workouts extends JPanel {
                 repaint();
             }
         });
-        btnAtras.setBounds(540, 159, 89, 23);
+        btnAtras.setBounds(539, 435, 89, 23);
         add(btnAtras);
+        
+        JButton btnPerfil = new JButton("Perfil");
+        btnPerfil.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+                Perfil p = new Perfil();
+                p.setSize(950, 500);
+                p.setLocation(0, 0);
+
+                removeAll();
+                add(p, BorderLayout.CENTER);
+                revalidate();
+                repaint();
+        	}
+        });
+        btnPerfil.setBounds(543, 10, 85, 21);
+        add(btnPerfil);
     }
 }

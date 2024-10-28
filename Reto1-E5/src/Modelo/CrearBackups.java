@@ -17,7 +17,7 @@ public class CrearBackups {
 	}
 	
 	private static void escribirUsuariosEnArchivo(ArrayList<Usuarios> usuarios) {
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Archivos/usuarios.dat"))) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Backups/usuarios.dat"))) {
 			oos.writeObject(usuarios);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -25,7 +25,7 @@ public class CrearBackups {
 	}
 	
 	private static void escribirWorkoutsEnArchivo(ArrayList<Workouts> workouts) {
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Archivos/workouts.dat"))) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Backups/workouts.dat"))) {
 			oos.writeObject(workouts);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -52,7 +52,7 @@ public class Registro1 extends JPanel {
 
 		JLabel lblRegistro = new JLabel("Registro");
 		lblRegistro.setFont(new Font("Arial Black", Font.BOLD, 28));
-		lblRegistro.setBounds(332, 11, 161, 76);
+		lblRegistro.setBounds(238, 10, 161, 76);
 		add(lblRegistro);
 
 		JLabel lblNombre = new JLabel("Nombre");
@@ -62,67 +62,67 @@ public class Registro1 extends JPanel {
 
 		JLabel lblApellido = new JLabel("Apellido");
 		lblApellido.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		lblApellido.setBounds(25, 182, 95, 17);
+		lblApellido.setBounds(25, 168, 95, 17);
 		add(lblApellido);
 
 		JLabel lblUsuario = new JLabel("Usuario");
 		lblUsuario.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		lblUsuario.setBounds(25, 256, 95, 14);
+		lblUsuario.setBounds(25, 237, 95, 14);
 		add(lblUsuario);
 
 		textFieldNombre = new JTextField();
-		textFieldNombre.setBounds(169, 105, 161, 20);
+		textFieldNombre.setBounds(140, 106, 161, 20);
 		add(textFieldNombre);
 		textFieldNombre.setColumns(10);
 
 		textFieldApellido = new JTextField();
-		textFieldApellido.setBounds(169, 179, 161, 20);
+		textFieldApellido.setBounds(140, 170, 161, 20);
 		add(textFieldApellido);
 		textFieldApellido.setColumns(10);
 
 		JLabel lblContraseña = new JLabel("Contraseña");
 		lblContraseña.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		lblContraseña.setBounds(25, 332, 122, 14);
+		lblContraseña.setBounds(25, 299, 122, 14);
 		add(lblContraseña);
 
 		textFieldUsuario = new JTextField();
-		textFieldUsuario.setBounds(169, 253, 161, 20);
+		textFieldUsuario.setBounds(140, 238, 161, 20);
 		add(textFieldUsuario);
 		textFieldUsuario.setColumns(10);
 
 		textFieldMail = new JTextField();
-		textFieldMail.setBounds(169, 407, 161, 20);
+		textFieldMail.setBounds(140, 354, 161, 20);
 		add(textFieldMail);
 		textFieldMail.setColumns(10);
 
 		JLabel lblMail = new JLabel("Mail");
 		lblMail.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		lblMail.setBounds(25, 410, 122, 17);
+		lblMail.setBounds(25, 352, 122, 17);
 		add(lblMail);
 
 		JLabel lblRepetirContrasea = new JLabel("Repetir Contraseña");
 		lblRepetirContrasea.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		lblRepetirContrasea.setBounds(456, 332, 194, 14);
+		lblRepetirContrasea.setBounds(332, 299, 194, 14);
 		add(lblRepetirContrasea);
 
 		JLabel lblFNacimiento = new JLabel("F. Nacimiento");
 		lblFNacimiento.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		lblFNacimiento.setBounds(456, 108, 194, 14);
+		lblFNacimiento.setBounds(332, 105, 194, 14);
 		add(lblFNacimiento);
 
 		textFieldFNac = new JTextField();
 		textFieldFNac.setColumns(10);
-		textFieldFNac.setBounds(667, 105, 161, 20);
+		textFieldFNac.setBounds(472, 106, 161, 20);
 		add(textFieldFNac);
 
 		JRadioButton rdbtnEntrenador = new JRadioButton("Entrenador");
 		rdbtnEntrenador.setFont(new Font("Arial", Font.BOLD, 17));
-		rdbtnEntrenador.setBounds(456, 180, 161, 23);
+		rdbtnEntrenador.setBounds(332, 166, 161, 23);
 		add(rdbtnEntrenador);
 
 		JRadioButton rdbtnCliente = new JRadioButton("Cliente");
 		rdbtnCliente.setFont(new Font("Arial", Font.BOLD, 17));
-		rdbtnCliente.setBounds(456, 255, 161, 23);
+		rdbtnCliente.setBounds(332, 234, 161, 23);
 		add(rdbtnCliente);
 
 		ButtonGroup grupo1 = new ButtonGroup();
@@ -132,7 +132,7 @@ public class Registro1 extends JPanel {
 		JLabel lblError = new JLabel("");
 		lblError.setForeground(new Color(255, 0, 0));
 		lblError.setFont(new Font("Arial Black", Font.PLAIN, 14));
-		lblError.setBounds(412, 437, 390, 30);
+		lblError.setBounds(123, 426, 390, 30);
 		add(lblError);
 
 		JButton btnRegistrarse = new JButton("Registrarse");
@@ -205,15 +205,15 @@ public class Registro1 extends JPanel {
 			}
 		});
 		btnRegistrarse.setFont(new Font("Arial Black", Font.PLAIN, 17));
-		btnRegistrarse.setBounds(537, 403, 152, 23);
+		btnRegistrarse.setBounds(238, 395, 152, 23);
 		add(btnRegistrarse);
 
 		textFieldRepContraseña = new JPasswordField();
-		textFieldRepContraseña.setBounds(667, 332, 161, 20);
+		textFieldRepContraseña.setBounds(521, 300, 109, 20);
 		add(textFieldRepContraseña);
 
 		textFieldContraseña = new JPasswordField();
-		textFieldContraseña.setBounds(169, 332, 161, 20);
+		textFieldContraseña.setBounds(140, 300, 161, 20);
 		add(textFieldContraseña);
 		
 		JButton btnAtras = new JButton("Atras");
@@ -229,7 +229,7 @@ public class Registro1 extends JPanel {
 				repaint();
 			}
 		});
-		btnAtras.setBounds(822, 444, 89, 23);
+		btnAtras.setBounds(544, 433, 89, 23);
 		add(btnAtras);
 
 	

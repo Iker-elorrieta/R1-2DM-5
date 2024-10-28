@@ -159,12 +159,17 @@ public class Metodos {
 
 
 
-    private void abrirVideo(String videoURL) {
+    private void abrirVideo(String videoID) {
         try {
-            if (videoURL == null || videoURL.isEmpty()) {
+            String baseURL = "https://www.youtube.com/watch?v=";
+
+            if (videoID == null || videoID.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "La URL del video no es válida.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            
+            String videoURL = baseURL + videoID;
+            
             URI uri = new URI(videoURL);
             if (Desktop.isDesktopSupported()) {
                 Desktop desktop = Desktop.getDesktop();
@@ -178,6 +183,7 @@ public class Metodos {
             e.printStackTrace();
         }
     }
+
 
     // Métodos para obtener workouts y niveles
 
@@ -272,12 +278,12 @@ public class Metodos {
     }
     
     public void verificarYCrearArchivo() {
-        File carpeta = new File("Archivos");
+        File carpeta = new File("Backups");
         if (!carpeta.exists()) {
             if (carpeta.mkdirs()) {
-                System.out.println("Carpeta 'Archivos' creada.");
+                System.out.println("Carpeta 'Backups' creada.");
             } else {
-                System.out.println("No se pudo crear la carpeta 'Archivos'.");
+                System.out.println("No se pudo crear la carpeta 'Backups'.");
             }
         }
 
