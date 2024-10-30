@@ -24,7 +24,6 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 
-import Modelo.CrearBackups;
 
 public class Login extends JPanel {
 
@@ -125,9 +124,12 @@ public class Login extends JPanel {
 					if (loginUser != null) {
 						System.out.println("login success");
 						
-						
-						
-						CrearBackups.main(null);
+						try {
+		                    ProcessBuilder builder = new ProcessBuilder("java", "-jar", "CrearBackups.jar");
+		                    builder.start();
+		                } catch (Exception e1) {
+		                    e1.printStackTrace();
+		                }
 						Perfil p = new Perfil(user); // Pasar el contentPane al perfil
 						p.setSize(950, 500);
 						p.setLocation(0, 0);

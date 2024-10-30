@@ -18,7 +18,9 @@ public class CrearBackups {
 	
 	private static void escribirUsuariosEnArchivo(ArrayList<Usuarios> usuarios) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("Backups/usuarios.dat"))) {
-			oos.writeObject(usuarios);
+			for(Usuarios usu: usuarios) {
+				oos.writeObject(usu);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

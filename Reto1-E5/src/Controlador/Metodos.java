@@ -2,8 +2,6 @@ package Controlador;
 
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,47 +22,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.google.api.core.ApiFuture;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
+import Conexion.Conexion;
 import Modelo.Workouts;
 
+
 public class Metodos {
-	// Metodos para la conexion
-	
-	private static String nombreJSON = "gymapp.json";
-	private static String projectID = "grupo5-gymapp";
-	
-	public Firestore conectar() throws IOException {
-		FileInputStream serviceAccount;
-		Firestore fs = null;
-		try {
-			serviceAccount = new FileInputStream(nombreJSON);
-
-			FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
-					.setProjectId(projectID).setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
-			fs = firestoreOptions.getService();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		return fs;
-	}
-	
-	public void cerrar(Firestore fs) {
-	    if (fs != null) {
-	        try {
-				fs.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	    }
-	}
-
     // Métodos de validación
 
     public boolean contraComprobar(String contraseña, String repContraseña) {
@@ -221,7 +188,8 @@ public class Metodos {
     // Métodos para obtener workouts y niveles
 
     public ArrayList<Workouts> mObtenerWorkouts() throws IOException {
-        Firestore db = conectar();
+    	Conexion conexion = new Conexion();
+        Firestore db = conexion.conectar();
         ArrayList<Workouts> listaWorkouts = new ArrayList<>();
 
         try {
@@ -250,15 +218,16 @@ public class Metodos {
             System.out.println("Error: Clase Workouts, metodo mObtenerWorkouts");
             e.printStackTrace();
         } finally {
-            cerrar(db);
+            conexion.cerrar(db);
         }
 
         return listaWorkouts;
     }
     
     public ArrayList<String> mObtenerEjerciciosIDs(String workoutNombre) throws IOException {
+    	Conexion conexion = new Conexion();
         ArrayList<String> listaIDs = new ArrayList<>();
-        Firestore db = conectar();
+        Firestore db = conexion.conectar();
 
         try {
             // Convertir el nombre del workout a minúsculas para obtener el ID correspondiente
@@ -275,7 +244,7 @@ public class Metodos {
             System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosIDs");
             e.printStackTrace();
         } finally {
-            cerrar(db);
+            conexion.cerrar(db);
         }
 
         return listaIDs;
@@ -284,8 +253,9 @@ public class Metodos {
 
 
     public ArrayList<Integer> mObtenerNiveles() throws IOException {
+    	Conexion conexion = new Conexion();
         ArrayList<Integer> listaNiveles = new ArrayList<>();
-        Firestore db = conectar();
+        Firestore db = conexion.conectar();
 
         try {
             CollectionReference workoutsRef = db.collection("workouts");
@@ -301,7 +271,7 @@ public class Metodos {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         } finally {
-            cerrar(db);
+            conexion.cerrar(db);
         }
 
         return listaNiveles;
