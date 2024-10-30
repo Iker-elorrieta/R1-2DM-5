@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +26,8 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
+import com.toedter.calendar.JDateChooser;
+import com.toedter.calendar.JTextFieldDateEditor;
 
 import Controlador.Metodos;
 
@@ -38,7 +40,6 @@ public class Registro1 extends JPanel {
 	private JTextField textFieldApellido;
 	private JTextField textFieldUsuario;
 	private JTextField textFieldMail;
-	private JTextField textFieldFNac;
 	private JPasswordField textFieldRepContraseña;
 	private JPasswordField textFieldContraseña;
 	/**
@@ -110,10 +111,26 @@ public class Registro1 extends JPanel {
 		lblFNacimiento.setBounds(332, 105, 194, 14);
 		add(lblFNacimiento);
 
-		textFieldFNac = new JTextField();
-		textFieldFNac.setColumns(10);
-		textFieldFNac.setBounds(472, 106, 161, 20);
-		add(textFieldFNac);
+		JDateChooser fechaNacimientoCalendar = new JDateChooser();
+        fechaNacimientoCalendar.setBounds(474, 105, 200, 20);
+        add(fechaNacimientoCalendar);
+
+        JTextFieldDateEditor editor = (JTextFieldDateEditor) fechaNacimientoCalendar.getDateEditor();
+        editor.setEditable(false);
+
+        Calendar ahoraMismo = Calendar.getInstance();
+        int ano = ahoraMismo.get(Calendar.YEAR);
+        int mes = ahoraMismo.get(Calendar.MONTH) + 1;
+        int dia = ahoraMismo.get(Calendar.DATE);
+        String maxString = ano + "-" + mes + "-" + dia;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        
+        try {
+            fechaNacimientoCalendar.setMaxSelectableDate(dateFormat.parse(maxString));
+            fechaNacimientoCalendar.setDate(dateFormat.parse(maxString));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
 		JRadioButton rdbtnEntrenador = new JRadioButton("Entrenador");
 		rdbtnEntrenador.setFont(new Font("Arial", Font.BOLD, 17));
@@ -142,18 +159,16 @@ public class Registro1 extends JPanel {
 				char[] arrayRepContra = textFieldRepContraseña.getPassword();
 				String Contraseña = new String(arrayContra);
 				String repContraseña = new String(arrayRepContra);
-				String fNac = textFieldFNac.getText();
 				String mail = textFieldMail.getText();
 				String usuario = textFieldUsuario.getText();
 				String apellido = textFieldApellido.getText();
 				String nombre = textFieldNombre.getText();
 
+				System.out.println(ahoraMismo);
+				
 				if (nombre.intern() == "" || apellido.intern() == "" || usuario.intern() == "" || mail.intern() == ""
-						|| fNac.intern() == "" || Contraseña.intern() == "" || repContraseña.intern() == "") {
+						 || Contraseña.intern() == "" || repContraseña.intern() == "") {
 					lblError.setText("Rellena todos los campos");
-
-				} else if (!metodos.comprobarFecha(fNac, "dd/MM/yyyy")) {
-					lblError.setText("Formato de fehca de nacimiento no válida('dd/MM/yyyy')");
 				} else if (!metodos.validarEmail(mail)) {
 					lblError.setText("Mail no válido");
 				} else if (!rdbtnEntrenador.isSelected() && !rdbtnCliente.isSelected()) {
@@ -179,19 +194,11 @@ public class Registro1 extends JPanel {
 						usuario1.put("apellido", apellido);
 						usuario1.put("contrasena", Contraseña);
 						usuario1.put("correo", mail);
+						usuario1.put("fecha de nacimiento", fechaNacimientoCalendar.getDate());
 						if (rdbtnCliente.isSelected()) {
 							usuario1.put("nivel", 0);
 						}
-
-						// fecha nacimiento
-						SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
-						try {
-							Date fecha = formato.parse(fNac);
-							usuario1.put("fecha de nacimiento", fecha);
-						} catch (ParseException e1) {
-
-							e1.printStackTrace();
-						}
+						
 						usuarios.document(usuario).set(usuario1);
 
 					} catch (IOException e1) {
@@ -234,5 +241,4 @@ public class Registro1 extends JPanel {
 
 	
 	}
-
 }
