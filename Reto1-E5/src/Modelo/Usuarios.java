@@ -12,7 +12,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
-import Conexion.Conexion;
+import Controlador.Metodos;
+
 
 public class Usuarios implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -107,13 +108,13 @@ public class Usuarios implements Serializable {
     
     
     public ArrayList<Usuarios> bajarTodosLosUsuarios() {
-    	Conexion conexion = new Conexion();
+    	Metodos metodos = new Metodos();
 		Firestore co = null;
 
 		ArrayList<Usuarios> listaUsuarios = new ArrayList<Usuarios>();
 
 		try {
-			co = conexion.conectar();
+			co = metodos.conectar();
 
 			ApiFuture<QuerySnapshot> query = co.collection("usuarios").get();
 

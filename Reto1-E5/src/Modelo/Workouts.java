@@ -12,7 +12,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 
-import Conexion.Conexion;
+import Controlador.Metodos;
+
 
 public class Workouts implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -65,8 +66,8 @@ public class Workouts implements Serializable {
     }
 
     public ArrayList<Workouts> mObtenerWorkouts() throws IOException {
-        Conexion conexion = new Conexion();
-        Firestore db = conexion.conectar();
+        Metodos metodos = new Metodos();
+        Firestore db = metodos.conectar();
         ArrayList<Workouts> listaWorkouts = new ArrayList<>();
 
         try {
@@ -96,7 +97,7 @@ public class Workouts implements Serializable {
             System.out.println("Error: Clase Workouts, metodo mObtenerWorkouts");
             e.printStackTrace();
         } finally {
-            conexion.cerrar(db);
+            metodos.cerrar(db);
         }
 
         return listaWorkouts;
@@ -104,8 +105,8 @@ public class Workouts implements Serializable {
 
     public ArrayList<Integer> mObtenerNiveles() throws IOException {
         ArrayList<Integer> listaNiveles = new ArrayList<>();
-        Conexion conexion = new Conexion();
-        Firestore db = conexion.conectar();
+        Metodos metodos = new Metodos();
+        Firestore db = metodos.conectar();
 
         try {
             CollectionReference workoutsRef = db.collection("workouts");
@@ -122,7 +123,7 @@ public class Workouts implements Serializable {
             System.out.println("Error: Clase Workouts, metodo mObtenerNiveles");
             e.printStackTrace();
         } finally {
-            conexion.cerrar(db);
+            metodos.cerrar(db);
         }
 
         return listaNiveles;
