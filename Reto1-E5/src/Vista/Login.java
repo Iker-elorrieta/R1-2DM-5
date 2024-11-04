@@ -135,12 +135,13 @@ public class Login extends JPanel {
 		                } catch (Exception e1) {
 		                    e1.printStackTrace();
 		                }
-						Perfil p = new Perfil(user);
-						p.setSize(950, 500);
-						p.setLocation(0, 0);
+
+					    Workouts w = new Workouts(user);
+					    w.setSize(950, 500);
+					    w.setLocation(0, 0);
 						
 						removeAll();
-						add(p, BorderLayout.CENTER);
+						add(w, BorderLayout.CENTER);
 						revalidate();
 						repaint();
 					} else {

@@ -116,7 +116,7 @@ public class Metodos {
                     // Panel para los ejercicios, que se mostrará al hacer clic en el nombre del workout
                     JPanel ejerciciosPanel = new JPanel();
                     ejerciciosPanel.setLayout(new BoxLayout(ejerciciosPanel, BoxLayout.Y_AXIS));
-                    ejerciciosPanel.setVisible(false); // Inicialmente oculto
+                    ejerciciosPanel.setVisible(false);
                     workoutPanel.add(ejerciciosPanel);
 
                     // Acción para mostrar/ocultar ejercicios cuando se hace clic en el nombre del workout

@@ -50,12 +50,12 @@ public class Workouts extends JPanel {
         JButton btnAtras = new JButton("Atras");
         btnAtras.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Perfil p = new Perfil(user);
-                p.setSize(950, 500);
-                p.setLocation(0, 0);
+                Login l = new Login();
+                l.setSize(950, 500);
+                l.setLocation(0, 0);
 
                 removeAll();
-                add(p, BorderLayout.CENTER);
+                add(l, BorderLayout.CENTER);
                 revalidate();
                 repaint();
             }

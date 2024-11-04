@@ -80,12 +80,12 @@ public class Perfil extends JPanel {
 		btnAcciones.setBounds(332, 188, 182, 46);
 		btnAcciones.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Workouts r = new Workouts(user);
-				r.setSize(950, 500);
-				r.setLocation(0, 0);
+				Perfil p = new Perfil(user);
+				p.setSize(950, 500);
+				p.setLocation(0, 0);
 				
 				removeAll();
-				add(r, BorderLayout.CENTER);
+				add(p, BorderLayout.CENTER);
 				revalidate();
 				repaint();
 			}
