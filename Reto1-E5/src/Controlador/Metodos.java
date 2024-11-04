@@ -175,8 +175,6 @@ public class Metodos {
                 Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.BROWSE)) {
                     desktop.browse(uri);
-                } else {
-                    System.out.println("Desktop no soportado");
                 }
             }
         } catch (IOException | URISyntaxException e) {

@@ -100,8 +100,7 @@ public class Login extends JPanel {
 					Firestore db = options.getService();
 					
 					QueryDocumentSnapshot loginUser = null;
-					System.out.println("login attempt on "+correo);
-					
+										
 					Conexion conexion = new Conexion();
 					boolean conectar =conexion.verificarConexion(db);
 					if(!conectar) {
@@ -127,7 +126,7 @@ public class Login extends JPanel {
 					}
 					
 					if (loginUser != null) {
-						System.out.println("login success");
+						
 						
 						try {
 		                    ProcessBuilder builder = new ProcessBuilder("java", "-jar", "CrearBackups.jar");
@@ -136,7 +135,7 @@ public class Login extends JPanel {
 		                    e1.printStackTrace();
 		                }
 
-					    Workouts w = new Workouts(user);
+					    Perfil w = new Perfil(user);
 					    w.setSize(950, 500);
 					    w.setLocation(0, 0);
 						
@@ -145,7 +144,7 @@ public class Login extends JPanel {
 						revalidate();
 						repaint();
 					} else {
-						System.out.println("login failed");
+						
 					}
 				} catch (Exception e1) { e1.printStackTrace(); }
 
