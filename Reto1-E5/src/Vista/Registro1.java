@@ -164,7 +164,7 @@ public class Registro1 extends JPanel {
 				String apellido = textFieldApellido.getText();
 				String nombre = textFieldNombre.getText();
 
-				System.out.println(ahoraMismo);
+				
 				
 				if (nombre.intern() == "" || apellido.intern() == "" || usuario.intern() == "" || mail.intern() == ""
 						 || Contraseña.intern() == "" || repContraseña.intern() == "") {
