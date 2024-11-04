@@ -17,6 +17,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/in2dm3-a/Desktop/ProyectoGit/R1-2DM-5/Reto1-E5/CrearBackups.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

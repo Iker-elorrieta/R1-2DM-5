@@ -24,6 +24,8 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 
+import Conexion.Conexion;
+
 
 public class Login extends JPanel {
 
@@ -92,7 +94,6 @@ public class Login extends JPanel {
 				String contrasena = new String(arrayContra);
 				
 				try {
-					// conexion con la base de datos
 					FileInputStream serviceAccount = new FileInputStream(credArchivo);
 					FirestoreOptions options = FirestoreOptions.getDefaultInstance().toBuilder()
 							.setProjectId(proyectoID).setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
@@ -101,7 +102,12 @@ public class Login extends JPanel {
 					QueryDocumentSnapshot loginUser = null;
 					System.out.println("login attempt on "+correo);
 					
-					// obtener coleccion de usuarios
+					Conexion conexion = new Conexion();
+					boolean conectar =conexion.verificarConexion(db);
+					if(!conectar) {
+						System.out.println("Error en la conexión, utilizando datos desde el backup");
+					}
+					
 					List<QueryDocumentSnapshot> usuarios = db.collection(usuariosColl).get().get().getDocuments();
 					for (QueryDocumentSnapshot usuarioSnapshot : usuarios) {
 						String queryMail = usuarioSnapshot.getString(correoField);
@@ -120,7 +126,6 @@ public class Login extends JPanel {
 						}
 					}
 					
-					// comprobar resultado login
 					if (loginUser != null) {
 						System.out.println("login success");
 						
@@ -130,7 +135,7 @@ public class Login extends JPanel {
 		                } catch (Exception e1) {
 		                    e1.printStackTrace();
 		                }
-						Perfil p = new Perfil(user); // Pasar el contentPane al perfil
+						Perfil p = new Perfil(user);
 						p.setSize(950, 500);
 						p.setLocation(0, 0);
 						
