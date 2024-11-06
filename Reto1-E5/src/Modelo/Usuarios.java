@@ -18,6 +18,14 @@ import Conexion.Conexion;
 public class Usuarios implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    private static final String UsuariosCol = "usuarios";
+    private static final String Correo = "correo";
+    private static final String Contrasena = "contrasena";
+    private static final String Apellido = "apellido";
+    private static final String FechaNac = "fechaNacimiento";
+    private static final String Nivel = "nivel";
+    private static final String Nombre = "nombre";
+    
 
     private String correo;
     private String contrasena;
@@ -116,16 +124,16 @@ public class Usuarios implements Serializable {
 		try {
 			co = conexion.conectar();
 
-			ApiFuture<QuerySnapshot> query = co.collection("usuarios").get();
+			ApiFuture<QuerySnapshot> query = co.collection(UsuariosCol).get();
 
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> usuariosFireBase = querySnapshot.getDocuments();
 			for (QueryDocumentSnapshot usuarioFireBase : usuariosFireBase) {
 
-				Usuarios usuario = new Usuarios(usuarioFireBase.getString("correo"),
-						usuarioFireBase.getString("contrasena"), usuarioFireBase.getString("apellido"),
-						usuarioFireBase.getDate("fechaNacimiento"), usuarioFireBase.getDouble("nivel"),
-						usuarioFireBase.getString("nombre"));
+				Usuarios usuario = new Usuarios(usuarioFireBase.getString(Correo),
+						usuarioFireBase.getString(Contrasena), usuarioFireBase.getString(Apellido),
+						usuarioFireBase.getDate(FechaNac), usuarioFireBase.getDouble(Nivel),
+						usuarioFireBase.getString(Nombre));
 
 				listaUsuarios.add(usuario);
 			}

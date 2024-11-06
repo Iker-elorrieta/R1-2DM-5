@@ -5,13 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -22,10 +16,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
@@ -118,19 +108,7 @@ public class Registro1 extends JPanel {
         JTextFieldDateEditor editor = (JTextFieldDateEditor) fechaNacimientoCalendar.getDateEditor();
         editor.setEditable(false);
 
-        Calendar ahoraMismo = Calendar.getInstance();
-        int ano = ahoraMismo.get(Calendar.YEAR);
-        int mes = ahoraMismo.get(Calendar.MONTH) + 1;
-        int dia = ahoraMismo.get(Calendar.DATE);
-        String maxString = ano + "-" + mes + "-" + dia;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        
-        try {
-            fechaNacimientoCalendar.setMaxSelectableDate(dateFormat.parse(maxString));
-            fechaNacimientoCalendar.setDate(dateFormat.parse(maxString));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        metodos.configurarFechaNacimiento(fechaNacimientoCalendar);
 
 		JRadioButton rdbtnEntrenador = new JRadioButton("Entrenador");
 		rdbtnEntrenador.setFont(new Font("Arial", Font.BOLD, 17));
@@ -155,60 +133,27 @@ public class Registro1 extends JPanel {
 		JButton btnRegistrarse = new JButton("Registrarse");
 		btnRegistrarse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				char[] arrayContra = textFieldContraseña.getPassword();
-				char[] arrayRepContra = textFieldRepContraseña.getPassword();
-				String Contraseña = new String(arrayContra);
-				String repContraseña = new String(arrayRepContra);
-				String mail = textFieldMail.getText();
-				String usuario = textFieldUsuario.getText();
-				String apellido = textFieldApellido.getText();
 				String nombre = textFieldNombre.getText();
-
-				
-				
-				if (nombre.intern() == "" || apellido.intern() == "" || usuario.intern() == "" || mail.intern() == ""
-						 || Contraseña.intern() == "" || repContraseña.intern() == "") {
-					lblError.setText("Rellena todos los campos");
-				} else if (!metodos.validarEmail(mail)) {
-					lblError.setText("Mail no válido");
-				} else if (!rdbtnEntrenador.isSelected() && !rdbtnCliente.isSelected()) {
-					lblError.setText("Selecciona tipo de usuario");
-				} else if (!metodos.contraComprobar(Contraseña, repContraseña)) {
-					lblError.setText("Las contraseñas no coinciden");
-				} else {
-					lblError.setText("Registro realizado correctamente");
-					updateUI();
-				
-					FileInputStream serviceAccount;
-					try {
-						serviceAccount = new FileInputStream("gymapp.json");
-						FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
-								.setProjectId("grupo5-gymapp")
-								.setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
-						Firestore db = firestoreOptions.getService();
-
-						CollectionReference usuarios = db.collection("usuarios");
-
-						Map<String, Object> usuario1 = new HashMap<>();
-						usuario1.put("nombre", nombre);
-						usuario1.put("apellido", apellido);
-						usuario1.put("contrasena", Contraseña);
-						usuario1.put("correo", mail);
-						usuario1.put("fecha de nacimiento", fechaNacimientoCalendar.getDate());
-						if (rdbtnCliente.isSelected()) {
-							usuario1.put("nivel", 0);
-						}
-						
-						usuarios.document(usuario).set(usuario1);
-
-					} catch (IOException e1) {
-
-						e1.printStackTrace();
-					}
-
-				}
-
-				updateUI();
+                String apellido = textFieldApellido.getText();
+                String usuario = textFieldUsuario.getText();
+                String mail = textFieldMail.getText();
+                String contrasena = new String(textFieldContraseña.getPassword());
+                String repContrasena = new String(textFieldRepContraseña.getPassword());
+                Date fechaNacimiento = fechaNacimientoCalendar.getDate();
+                
+                if (nombre.isEmpty() || apellido.isEmpty() || usuario.isEmpty() || mail.isEmpty() 
+                        || contrasena.isEmpty() || repContrasena.isEmpty()) {
+                    lblError.setText("Rellena todos los campos");
+                } else if (!metodos.validarEmail(mail)) {
+                    lblError.setText("Mail no válido");
+                } else if (!rdbtnEntrenador.isSelected() && !rdbtnCliente.isSelected()) {
+                    lblError.setText("Selecciona tipo de usuario");
+                } else if (!metodos.contraComprobar(contrasena, repContrasena)) {
+                    lblError.setText("Las contraseñas no coinciden");
+                } else {
+                    boolean esCliente = rdbtnCliente.isSelected();
+                    metodos.registrarUsuario(nombre, apellido, usuario, mail, contrasena, fechaNacimiento, esCliente, lblError);
+                }
 			}
 		});
 		btnRegistrarse.setFont(new Font("Arial Black", Font.PLAIN, 17));

@@ -5,7 +5,6 @@ import javax.swing.JPanel;
 import Controlador.Metodos;
 import javax.swing.JLabel;
 import java.awt.Font;
-import java.util.ArrayList;
 
 public class Ejercicios extends JPanel {
     Metodos metodos = new Metodos();

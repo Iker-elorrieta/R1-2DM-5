@@ -18,6 +18,11 @@ import Conexion.Conexion;
 public class Workouts implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    private static final String WorkoutsCol = "workouts";
+    private static final String Nombre = "nombre";
+    private static final String Video = "video";
+    private static final String EjerciciosNum = "numEjercicios";
+    private static final String Nivel = "nivel";
     private String video;
     private String nombre;
     private int ejercicios;
@@ -71,17 +76,17 @@ public class Workouts implements Serializable {
         ArrayList<Workouts> listaWorkouts = new ArrayList<>();
 
         try {
-            CollectionReference workouts = db.collection("workouts");
+            CollectionReference workouts = db.collection(WorkoutsCol);
             ApiFuture<QuerySnapshot> querySnapshot = workouts.get();
             List<QueryDocumentSnapshot> entrenos = querySnapshot.get().getDocuments();
 
             for (QueryDocumentSnapshot entreno : entrenos) {
                 Workouts work = new Workouts();
-                work.setNombre(entreno.getString("nombre"));
-                work.setVideo(entreno.getString("video"));
+                work.setNombre(entreno.getString(Nombre));
+                work.setVideo(entreno.getString(Video));
                 
-                Long ejercicios = entreno.getLong("numEjercicios");
-                Long nivel = entreno.getLong("nivel");
+                Long ejercicios = entreno.getLong(EjerciciosNum);
+                Long nivel = entreno.getLong(Nivel);
                 
                 if (ejercicios != null) {
                     work.setEjercicios(ejercicios.intValue());
@@ -109,12 +114,12 @@ public class Workouts implements Serializable {
         Firestore db = conexion.conectar();
 
         try {
-            CollectionReference workoutsRef = db.collection("workouts");
+            CollectionReference workoutsRef = db.collection(WorkoutsCol);
             ApiFuture<QuerySnapshot> querySnapshot = workoutsRef.get();
             List<QueryDocumentSnapshot> entrenos = querySnapshot.get().getDocuments();
 
             for (QueryDocumentSnapshot entreno : entrenos) {
-                Long nivel = entreno.getLong("nivel");
+                Long nivel = entreno.getLong(Nivel);
                 if (nivel != null && !listaNiveles.contains(nivel.intValue())) {
                     listaNiveles.add(nivel.intValue());
                 }

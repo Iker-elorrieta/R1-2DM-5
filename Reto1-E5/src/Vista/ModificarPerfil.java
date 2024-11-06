@@ -5,26 +5,16 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 
@@ -137,46 +127,9 @@ public class ModificarPerfil extends JPanel {
 				String apellido = textFieldApellido.getText();
 				String nombre = textFieldNombre.getText();
 
-				
-				
-				if (nombre.intern() == "" || apellido.intern() == ""  || mail.intern() == ""
-						 || Contraseña.intern() == "" || repContraseña.intern() == "") {
-					lblError.setText("Rellena todos los campos");
-				} else if (!metodos.validarEmail(mail)) {
-					lblError.setText("Mail no válido");
-				} else if (!metodos.contraComprobar(Contraseña, repContraseña)) {
-					lblError.setText("Las contraseñas no coinciden");
-				} else {
-					lblError.setText("Registro realizado correctamente");
-					updateUI();
-				
-					FileInputStream serviceAccount;
-					try {
-						serviceAccount = new FileInputStream("gymapp.json");
-						FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
-								.setProjectId("grupo5-gymapp")
-								.setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
-						Firestore db = firestoreOptions.getService();
-
-						CollectionReference usuarios = db.collection("usuarios");
-
-						Map<String, Object> usuario1 = new HashMap<>();
-						usuario1.put("nombre", nombre);
-						usuario1.put("apellido", apellido);
-						usuario1.put("contrasena", Contraseña);
-						usuario1.put("correo", mail);
-						usuario1.put("fecha de nacimiento", fechaNacimientoCalendar.getDate());
-						
-
-					} catch (IOException e1) {
-
-						e1.printStackTrace();
-					}
-
-				}
-
-				updateUI();
+				metodos.actualizarUsuario(nombre, apellido, mail, Contraseña, repContraseña, lblError);
 			}
+		
 		});
 		btnConfirmar.setFont(new Font("Arial Black", Font.PLAIN, 17));
 		btnConfirmar.setBounds(112, 392, 235, 23);

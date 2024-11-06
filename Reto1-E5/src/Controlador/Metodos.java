@@ -2,13 +2,18 @@ package Controlador;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,10 +27,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.google.api.core.ApiFuture;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.toedter.calendar.JDateChooser;
 
 import Conexion.Conexion;
 import Modelo.Workouts;
@@ -299,6 +307,142 @@ public class Metodos {
     }
     
 
-    
-    
+        private static final String credArchivo = "gymapp.json";
+        private static final String proyectoID = "grupo5-gymapp";
+        private static final String usuariosColl = "usuarios";
+        private static final String correoField = "correo";
+        private static final String contraField = "contrasena";
+
+        public QueryDocumentSnapshot iniciarSesion(String correo, String contrasena, JLabel lblError) throws Exception {
+            FileInputStream serviceAccount = new FileInputStream(credArchivo);
+            FirestoreOptions options = FirestoreOptions.getDefaultInstance().toBuilder()
+                    .setProjectId(proyectoID)
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build();
+            Firestore db = options.getService();
+            
+            Conexion conexion = new Conexion();
+            boolean conectar = conexion.verificarConexion(db);
+            if (!conectar) {
+                System.out.println("Error en la conexión, utilizando datos desde el backup");
+            }
+            
+            List<QueryDocumentSnapshot> usuarios = db.collection(usuariosColl).get().get().getDocuments();
+            
+            QueryDocumentSnapshot loginUser = null;
+            for (QueryDocumentSnapshot usuarioSnapshot : usuarios) {
+                String queryMail = usuarioSnapshot.getString(correoField);
+                String queryPass = usuarioSnapshot.getString(contraField);
+
+                if (queryMail.equals(correo) && queryPass.equals(contrasena)) {
+                    loginUser = usuarioSnapshot;
+                    break;
+                } else if (!queryMail.equals(correo) && !queryPass.equals(contrasena)) {
+                    lblError.setText("Introduce los datos correctamente");
+                } else if (!queryMail.equals(correo)) {
+                    lblError.setText("Mail no válido");
+                } else if (!queryPass.equals(contrasena)) {
+                    lblError.setText("Contraseña incorrecta");
+                }
+            }
+
+            return loginUser;
+        }
+
+        
+        public String actualizarUsuario(String nombre, String apellido, String mail, String contrasena, String repContrasena, JLabel lblError) {
+            if (nombre.isEmpty() || apellido.isEmpty() || mail.isEmpty() || contrasena.isEmpty() || repContrasena.isEmpty()) {
+                lblError.setText("Rellena todos los campos");
+                return "Campos incompletos";
+            }
+            
+            if (!validarEmailReg(mail)) {
+                lblError.setText("Mail no válido");
+                return "Email no válido";
+            }
+
+            if (!contraComprobarReg(contrasena, repContrasena)) {
+                lblError.setText("Las contraseñas no coinciden");
+                return "Contraseñas no coinciden";
+            }
+
+            try (FileInputStream serviceAccount = new FileInputStream("gymapp.json")) {
+                FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
+                        .setProjectId("grupo5-gymapp")
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+                Firestore db = firestoreOptions.getService();
+
+                Map<String, Object> usuarioData = new HashMap<>();
+                usuarioData.put("nombre", nombre);
+                usuarioData.put("apellido", apellido);
+                usuarioData.put("contrasena", contrasena);
+                usuarioData.put("correo", mail);
+
+                db.collection("usuarios").document(mail).set(usuarioData);
+
+                lblError.setText("Registro realizado correctamente");
+                return "Registro exitoso";
+
+            } catch (IOException e) {
+                lblError.setText("Error al conectar con Firestore");
+                e.printStackTrace();
+                return "Error de conexión";
+            }
+        }
+
+        public boolean validarEmailReg(String email) {
+            return email.contains("@") && email.contains(".");
+        }
+
+        public boolean contraComprobarReg(String contrasena, String repContrasena) {
+            return contrasena.equals(repContrasena);
+        }
+        
+        
+        public void configurarFechaNacimiento(JDateChooser fechaNacimientoCalendar) {
+            Calendar ahoraMismo = Calendar.getInstance();
+            int ano = ahoraMismo.get(Calendar.YEAR);
+            int mes = ahoraMismo.get(Calendar.MONTH) + 1;
+            int dia = ahoraMismo.get(Calendar.DATE);
+            String maxString = ano + "-" + mes + "-" + dia;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+            try {
+                fechaNacimientoCalendar.setMaxSelectableDate(dateFormat.parse(maxString));
+                fechaNacimientoCalendar.setDate(dateFormat.parse(maxString));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        public String registrarUsuario(String nombre, String apellido, String usuario, String mail, String contrasena,
+                Date fechaNacimiento, boolean esCliente, JLabel lblError) {
+        	try (FileInputStream serviceAccount = new FileInputStream("gymapp.json")) {
+        		FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
+        				.setProjectId("grupo5-gymapp")
+        				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        				.build();
+        		Firestore db = firestoreOptions.getService();
+        		CollectionReference usuarios = db.collection("usuarios");
+        		
+        		Map<String, Object> usuarioData = new HashMap<>();
+        		usuarioData.put("nombre", nombre);
+        		usuarioData.put("apellido", apellido);
+        		usuarioData.put("contrasena", contrasena);
+        		usuarioData.put("correo", mail);
+        		usuarioData.put("fecha de nacimiento", fechaNacimiento);
+        		if (esCliente) {
+        			usuarioData.put("nivel", 0);
+        			}
+
+        		usuarios.document(usuario).set(usuarioData);
+        		lblError.setText("Registro realizado correctamente");
+        		return "Registro realizado correctamente";
+        		} catch (IOException e) {
+        			e.printStackTrace();
+        		lblError.setText("Error al conectar con Firestore");
+        		return "Error al conectar con Firestore";
+        		}
+        	}
 }
