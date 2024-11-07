@@ -1,6 +1,9 @@
 package Controlador;
 
+import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,7 +39,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.toedter.calendar.JDateChooser;
 
 import Conexion.Conexion;
+import Modelo.Ejercicio;
 import Modelo.Workouts;
+import Vista.Ejercicios;
 
 
 public class Metodos {
@@ -79,12 +84,10 @@ public class Metodos {
 
     // Mostrar workouts según el nivel seleccionado
 
-    public void mostrarDatosWorkouts(JComboBox<Object> nivelComboBox, JPanel panelWorkouts) {
+    public void mostrarDatosWorkouts(String user, JComboBox<Object> nivelComboBox, JPanel panelWorkouts) {
         try {
             ArrayList<Workouts> listaWorkouts = mObtenerWorkouts();
             Object nivelSeleccionado = nivelComboBox.getSelectedItem();
-
-            panelWorkouts.removeAll();
 
             for (Workouts workout : listaWorkouts) {
                 boolean mostrarWorkout = false;
@@ -102,9 +105,21 @@ public class Metodos {
                     workoutPanel.setLayout(new BoxLayout(workoutPanel, BoxLayout.Y_AXIS));
 
                     JLabel nivelLabel = new JLabel("Nivel: " + workout.getNivel());
-                    JLabel ejerciciosLabel = new JLabel("Ejercicios: " + workout.getEjercicios());
                     JLabel videoLabel = new JLabel("Video: " + workout.getVideo());
-                    
+
+                    // Obtener los ejercicios de este workout
+                    ArrayList<Ejercicio> ejercicios = mObtenerEjerciciosDescripcion(workout.getNombre());
+                    JLabel ejerciciosCountLabel = new JLabel("Número de Ejercicios: " + ejercicios.size());
+                    workoutPanel.add(ejerciciosCountLabel);
+
+                    // Mostrar los nombres de los ejercicios
+                    StringBuilder nombresEjercicios = new StringBuilder("<html>");
+                    for (Ejercicio ejercicio : ejercicios) {
+                        nombresEjercicios.append(ejercicio.getNombre()).append("<br>");
+                    }
+                    nombresEjercicios.append("</html>");
+                    JLabel ejerciciosNamesLabel = new JLabel(nombresEjercicios.toString());
+                    workoutPanel.add(ejerciciosNamesLabel);
 
                     // Listener para abrir el video
                     videoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -116,40 +131,26 @@ public class Metodos {
                     // Añadimos los elementos de texto al workoutPanel
                     workoutPanel.add(nivelLabel);
                     workoutPanel.add(videoLabel);
-                    workoutPanel.add(ejerciciosLabel);
-                    
+
                     JButton verEjerciciosButton = new JButton("Iniciar workout");
                     workoutPanel.add(verEjerciciosButton);
+                    verEjerciciosButton.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            String nombreWorkout = workout.getNombre();
+							
+							// Crear el panel Ejercicios pasando el nombre del workout y la lista de ejercicios
+							Ejercicios ej = new Ejercicios(user, nombreWorkout, ejercicios);
+							ej.setSize(950, 500);
+							ej.setLocation(0, 0);
 
-                    // Panel para los ejercicios, que se mostrará al hacer clic en el nombre del workout
-                    JPanel ejerciciosPanel = new JPanel();
-                    ejerciciosPanel.setLayout(new BoxLayout(ejerciciosPanel, BoxLayout.Y_AXIS));
-                    ejerciciosPanel.setVisible(false);
-                    workoutPanel.add(ejerciciosPanel);
+							// Reemplazar el contenido del panel principal con el panel de ejercicios
+							JPanel perfilPanel = (JPanel) panelWorkouts.getParent().getParent().getParent(); // Obtén el panel Perfil
+							perfilPanel.removeAll();
+							perfilPanel.setLayout(new BorderLayout());
+							perfilPanel.add(ej, BorderLayout.CENTER);
 
-                    // Acción para mostrar/ocultar ejercicios cuando se hace clic en el nombre del workout
-                    workoutPanel.addMouseListener(new java.awt.event.MouseAdapter() {
-                        public void mouseClicked(java.awt.event.MouseEvent evt) {
-                            if (!ejerciciosPanel.isVisible()) {
-                                try {
-                                    // Obtener y mostrar los ejercicios del workout
-                                    ArrayList<String> ejercicios = mObtenerEjerciciosIDs(workout.getNombre());
-                                    ejerciciosPanel.removeAll(); // Limpiar el panel antes de agregar los ejercicios
-
-                                    for (String ejercicio : ejercicios) {
-                                        JLabel ejercicioLabel = new JLabel(ejercicio);
-                                        ejerciciosPanel.add(ejercicioLabel);
-                                    }
-
-                                    ejerciciosPanel.revalidate();
-                                    ejerciciosPanel.repaint();
-                                } catch (IOException ex) {
-                                    ex.printStackTrace();
-                                    JOptionPane.showMessageDialog(panelWorkouts, "Error al obtener los ejercicios: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                                }
-                            }
-                            // Mostrar/ocultar el panel
-                            ejerciciosPanel.setVisible(!ejerciciosPanel.isVisible());
+							perfilPanel.revalidate();
+							perfilPanel.repaint();
                         }
                     });
 
@@ -164,6 +165,7 @@ public class Metodos {
             JOptionPane.showMessageDialog(panelWorkouts, "Error al obtener los workouts: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
 
 
@@ -255,6 +257,36 @@ public class Metodos {
 
         return listaIDs;
     }
+    
+    
+    public ArrayList<Ejercicio> mObtenerEjerciciosDescripcion(String workoutNombre) throws IOException {
+        Conexion conexion = new Conexion();
+        ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
+        Firestore db = conexion.conectar();
+
+        try {
+            // Convertir el nombre del workout a minúsculas para obtener el ID correspondiente
+            String workoutId = workoutNombre.toLowerCase(); 
+
+            CollectionReference ejerciciosRef = db.collection("workouts").document(workoutId).collection("ejercicios");
+            ApiFuture<QuerySnapshot> ejerciciosSnapshot = ejerciciosRef.get();
+            List<QueryDocumentSnapshot> ejerciciosDocs = ejerciciosSnapshot.get().getDocuments();
+
+            for (QueryDocumentSnapshot ejercicioDoc : ejerciciosDocs) {
+                String nombre = ejercicioDoc.getId();  // ID del ejercicio
+                String descripcion = ejercicioDoc.getString("descripcion"); // Obtener el campo "descripcion"
+                listaEjercicios.add(new Ejercicio(nombre, descripcion));
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosDetalles");
+            e.printStackTrace();
+        } finally {
+            conexion.cerrar(db);
+        }
+
+        return listaEjercicios;
+    }
+
 
 
 

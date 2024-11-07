@@ -26,6 +26,7 @@ public class Perfil extends JPanel {
 	
 	private JComboBox<Object> nivelComboBox;
     public JPanel panelWorkouts;
+    
 	public Perfil(String user) {
 		Metodos metodos = new Metodos();
 		
@@ -88,12 +89,12 @@ public class Perfil extends JPanel {
                 
 
                 metodos.cargarNiveles(nivelComboBox, panelWorkouts);
-                metodos.mostrarDatosWorkouts(nivelComboBox, panelWorkouts);
+                metodos.mostrarDatosWorkouts(user, nivelComboBox, panelWorkouts);
                 
-                		JLabel lblNewLabel = new JLabel(user);
-                		lblNewLabel.setBounds(20, 30, 166, 40);
+                		JLabel lblNewLabel = new JLabel("Perfil de " + user);
+                		lblNewLabel.setBounds(20, 30, 398, 40);
                 		add(lblNewLabel);
-                		lblNewLabel.setFont(new Font("Arial Black", Font.PLAIN, 28));
+                		lblNewLabel.setFont(new Font("Arial Black", Font.PLAIN, 24));
         
 	}
 }
