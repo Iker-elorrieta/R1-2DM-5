@@ -45,7 +45,6 @@ import Vista.Ejercicios;
 
 
 public class Metodos {
-    // Métodos de validación
 
     public boolean contraComprobar(String contraseña, String repContraseña) {
         return repContraseña.equals(contraseña);
@@ -477,4 +476,5 @@ public class Metodos {
         		return "Error al conectar con Firestore";
         		}
         	}
+
 }
