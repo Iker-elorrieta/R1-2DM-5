@@ -1,10 +1,10 @@
 package Vista;
 
-import javax.swing.JPanel;
 import Modelo.Ejercicio;
+import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.Timer;
+import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,9 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JOptionPane;
+import Controlador.Metodos;
 
 public class Ejercicios extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -23,15 +22,25 @@ public class Ejercicios extends JPanel {
     private JLabel nombreLabel;
     private JLabel descripcionLabel;
     private JLabel timerLabel;
-    private Timer timer;
-    private int elapsedTime = 0;
+    private int tiempoInicial;
+    private int tiempoTotalInicial;
     private boolean isTimerRunning = false;
-    private boolean isWorkoutStarted = false;
+    private boolean isWorkoutStarted = false;  // para verificar si el workout ha comenzado
     private List<String> ejerciciosRealizados = new ArrayList<>();
     private List<Map<String, Object>> workoutRealizado = new ArrayList<>();
+    private Metodos metodos;
 
-    public Ejercicios(String user, String workoutName, List<Ejercicio> ejercicios) {
+    private String user;
+    private String workoutName;
+
+    public Ejercicios(String user, String workoutName, List<Ejercicio> ejercicios, int tiempoTotalWorkout) {
+        this.user = user;
+        this.workoutName = workoutName;
         this.ejercicios = ejercicios;
+        this.tiempoInicial = tiempoTotalWorkout;
+        this.tiempoTotalInicial = tiempoTotalWorkout;
+        this.metodos = new Metodos();
+
         setLayout(null);
 
         JLabel workoutLabel = new JLabel("Workout: " + workoutName);
@@ -49,61 +58,49 @@ public class Ejercicios extends JPanel {
         descripcionLabel.setBounds(283, 43, 600, 25);
         add(descripcionLabel);
 
-        JButton siguienteButton = new JButton("Siguiente");
-        siguienteButton.setBounds(408, 79, 100, 30);
+        JButton siguienteButton = new JButton("Siguiente ejercicio");
+        siguienteButton.setBounds(309, 120, 151, 30);
+        siguienteButton.setEnabled(false); // Desactivar el botón "Siguiente" al inicio
         add(siguienteButton);
 
-        JButton anteriorButton = new JButton("Anterior");
-        anteriorButton.setBounds(268, 79, 100, 30);
-        anteriorButton.setEnabled(false);
-        add(anteriorButton);
-
         JButton iniciarButton = new JButton("Iniciar workout");
-        iniciarButton.setBounds(310, 120, 150, 30);
+        iniciarButton.setBounds(189, 80, 150, 30);
         add(iniciarButton);
 
-        timerLabel = new JLabel("Tiempo: 00:00");
+        timerLabel = new JLabel("Tiempo: " + formatTime(tiempoInicial));
         timerLabel.setBounds(50, 20, 150, 30);
         timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(timerLabel);
 
         JButton salirButton = new JButton("Salir");
-        salirButton.setBounds(310, 160, 150, 30);
+        salirButton.setBounds(417, 80, 150, 30);
         add(salirButton);
 
-        timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                elapsedTime++;
-                updateTimerLabel();
-            }
-        });
+        if (ejercicios.size() == 1) {
+            siguienteButton.setVisible(false);
+        }
 
         siguienteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (currentIndex < ejercicios.size() - 1) {
-                    ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
-                    currentIndex++;
-                    actualizarEjercicio();
-                    anteriorButton.setEnabled(true);
-                }
-                if (currentIndex == ejercicios.size() - 1) {
-                    siguienteButton.setEnabled(false);
-                }
-            }
-        });
+                int respuesta = JOptionPane.showConfirmDialog(
+                    Ejercicios.this,
+                    "¿Has completado el ejercicio \"" + ejercicios.get(currentIndex).getNombre() + "\"?",
+                    "Confirmar Ejercicio Completado",
+                    JOptionPane.YES_NO_OPTION
+                );
 
-        anteriorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    actualizarEjercicio();
-                    siguienteButton.setEnabled(true);
-                }
-                if (currentIndex == 0) {
-                    anteriorButton.setEnabled(false);
+                if (respuesta == JOptionPane.YES_OPTION) {
+                    ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
+
+                    if (currentIndex < ejercicios.size() - 1) {
+                        currentIndex++;
+                        actualizarEjercicio();
+                    }
+
+                    if (currentIndex == ejercicios.size() - 1) {
+                        siguienteButton.setEnabled(false);
+                    }
                 }
             }
         });
@@ -113,16 +110,18 @@ public class Ejercicios extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (!isWorkoutStarted) {
                     isWorkoutStarted = true;
-                    iniciarCrono();
+                    siguienteButton.setEnabled(true);
+                    metodos.iniciarCrono(Ejercicios.this);
                     iniciarButton.setText("Pausar workout");
                     iniciarButton.setBackground(Color.RED);
                 } else {
                     if (isTimerRunning) {
-                        pausarCrono();
+                        metodos.pausarCrono();
                         iniciarButton.setText("Reanudar workout");
                         iniciarButton.setBackground(Color.GREEN);
+                        isTimerRunning = false;
                     } else {
-                        reanudarCrono();
+                        metodos.reanudarCrono(Ejercicios.this);
                         iniciarButton.setText("Pausar workout");
                         iniciarButton.setBackground(Color.RED);
                     }
@@ -134,79 +133,24 @@ public class Ejercicios extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (isTimerRunning) {
-                    pararCrono();
+                    metodos.detenerCrono();
                 }
-                if (isWorkoutStarted && !ejerciciosRealizados.contains(ejercicios.get(currentIndex).getNombre())) {
-                    ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
-                }
-
-                Map<String, Object> workoutData = new HashMap<>();
-                workoutData.put("nombreWorkout", workoutName);
-                workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
-                workoutData.put("tiempoTotal", elapsedTime);
-
-                workoutRealizado.add(workoutData); // Agregar el workout realizado a la lista
-
-                int ejerciciosCompletados = ejerciciosRealizados.size();
-                int totalEjercicios = ejercicios.size();
-                double porcentajeCompletado = ((double) ejerciciosCompletados / totalEjercicios) * 100;
-
-                String mensajeMotivacional;
-                if (porcentajeCompletado == 100) {
-                    mensajeMotivacional = "¡Felicidades! Completaste todo el workout. ¡Sigue así!";
-                } else if (porcentajeCompletado == 50) {
-                    mensajeMotivacional = "¡Buen trabajo! Has completado la mitad del workout.";
-                } else if (porcentajeCompletado > 50) {
-                    mensajeMotivacional = "¡Bien hecho! Has completado más de la mitad del workout.";
+                
+                if (isWorkoutStarted) {
+                    metodos.finalizarWorkout(user, workoutName, ejercicios, ejerciciosRealizados, tiempoTotalInicial - tiempoInicial, workoutRealizado, Ejercicios.this);
                 } else {
-                    mensajeMotivacional = "No te desanimes, a la próxima lo conseguirás";
+                    Perfil p = new Perfil(user);
+                    p.setSize(950, 500);
+                    p.setLocation(0, 0);
+
+                    removeAll();
+                    add(p, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
                 }
-
-                String resumen = String.format(
-                        "Tiempo total: %02d:%02d\nEjercicios completados: %d de %d\nPorcentaje completado: %.2f%%\n\n%s",
-                        elapsedTime / 60, elapsedTime % 60,
-                        ejerciciosCompletados, totalEjercicios,
-                        porcentajeCompletado,
-                        mensajeMotivacional
-                );
-
-                JOptionPane.showMessageDialog(null, resumen, "Resumen del Workout", JOptionPane.INFORMATION_MESSAGE);
-
-                Perfil w = new Perfil(user);
-                w.setSize(950, 500);
-                w.setLocation(0, 0);
-                removeAll();
-                add(w, BorderLayout.CENTER);
-                revalidate();
-                repaint();
-
-                System.out.println(workoutRealizado); // Puedes revisar el estado de la lista aquí
             }
         });
 
-        if (ejercicios.size() == 1) {
-            siguienteButton.setEnabled(false);
-        }
-    }
-
-    private void iniciarCrono() {
-        timer.start();
-        isTimerRunning = true;
-    }
-
-    private void pausarCrono() {
-        timer.stop();
-        isTimerRunning = false;
-    }
-
-    private void reanudarCrono() {
-        timer.start();
-        isTimerRunning = true;
-    }
-
-    private void pararCrono() {
-        timer.stop();
-        isTimerRunning = false;
     }
 
     private void actualizarEjercicio() {
@@ -214,9 +158,53 @@ public class Ejercicios extends JPanel {
         descripcionLabel.setText("Descripción: " + ejercicios.get(currentIndex).getDescripcion());
     }
 
-    private void updateTimerLabel() {
-        int minutes = elapsedTime / 60;
-        int seconds = elapsedTime % 60;
-        timerLabel.setText(String.format("Tiempo: %02d:%02d", minutes, seconds));
+    private String formatTime(int seconds) {
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        return String.format("%02d:%02d", minutes, remainingSeconds);
+    }
+
+    public int getTiempoInicial() {
+        return tiempoInicial;
+    }
+
+    public void setTimerRunning(boolean running) {
+        this.isTimerRunning = running;
+    }
+
+    public void decrementarTiempoInicial() {
+        tiempoInicial--;
+    }
+
+    public void updateTimerLabel() {
+        timerLabel.setText(formatTime(tiempoInicial));
+    }
+
+    public int getTiempoTotalInicial() {
+        return tiempoTotalInicial;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getWorkoutName() {
+        return workoutName;
+    }
+    
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public List<Ejercicio> getEjercicios() {
+        return ejercicios;
+    }
+
+    public List<String> getEjerciciosRealizados() {
+        return ejerciciosRealizados;
+    }
+
+    public List<Map<String, Object>> getWorkoutRealizado() {
+        return workoutRealizado;
     }
 }
