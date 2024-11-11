@@ -84,6 +84,7 @@ public class Login extends JPanel {
 		        
 		        try {
 		            QueryDocumentSnapshot loginUser = metodos.iniciarSesion(correo, contrasena, lblError);
+		            Metodos.usuarioReferencia = loginUser.getReference();
 		            
 		            if (loginUser != null) {
 

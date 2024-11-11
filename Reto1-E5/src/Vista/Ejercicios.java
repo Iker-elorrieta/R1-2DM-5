@@ -5,6 +5,9 @@ import Modelo.Ejercicio;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.Timer;
+
+import Controlador.Metodos;
+
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -139,7 +142,7 @@ public class Ejercicios extends JPanel {
                 if (isWorkoutStarted && !ejerciciosRealizados.contains(ejercicios.get(currentIndex).getNombre())) {
                     ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
                 }
-
+                
                 Map<String, Object> workoutData = new HashMap<>();
                 workoutData.put("nombreWorkout", workoutName);
                 workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
@@ -162,6 +165,8 @@ public class Ejercicios extends JPanel {
                     mensajeMotivacional = "No te desanimes, a la próxima lo conseguirás";
                 }
 
+                Metodos.guardarDatosWorkout(porcentajeCompletado, elapsedTime, workoutName);
+                
                 String resumen = String.format(
                         "Tiempo total: %02d:%02d\nEjercicios completados: %d de %d\nPorcentaje completado: %.2f%%\n\n%s",
                         elapsedTime / 60, elapsedTime % 60,

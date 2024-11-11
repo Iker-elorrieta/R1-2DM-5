@@ -32,6 +32,8 @@ import javax.swing.JPanel;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -46,6 +48,8 @@ import Vista.Ejercicios;
 
 public class Metodos {
 
+	public static DocumentReference usuarioReferencia;
+	
     public boolean contraComprobar(String contraseña, String repContraseña) {
         return repContraseña.equals(contraseña);
     }
@@ -476,5 +480,26 @@ public class Metodos {
         		return "Error al conectar con Firestore";
         		}
         	}
+        
+
+        public static void guardarDatosWorkout(double porcentaje, double timepo, String workoutName) {
+        	try (FileInputStream serviceAccount = new FileInputStream("gymapp.json")) {
+        		FirestoreOptions firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
+        				.setProjectId("grupo5-gymapp")
+        				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+        				.build();
+        		Firestore db = firestoreOptions.getService();
+
+        		DocumentReference workout = db.collection("workouts").document(workoutName);
+        		DocumentReference workoutRef = usuarioReferencia.collection("workouts").document(workoutName);
+        		
+    			Map<String, Object> data = new HashMap<String, Object>();
+    			data.put("completados", porcentaje);
+    			data.put("fecha", new Date());
+    			data.put("tiempo total", timepo);
+    			data.put("workout", workout);
+    			workoutRef.set(data);
+    		} catch (IOException e) { e.printStackTrace(); }
+        }
 
 }
