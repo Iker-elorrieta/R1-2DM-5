@@ -272,20 +272,36 @@ public class Metodos {
         Firestore db = conexion.conectar();
 
         try {
-            // Convertir el nombre del workout a minúsculas para obtener el ID correspondiente
-            String workoutId = workoutNombre.toLowerCase(); 
+            String workoutId = workoutNombre.toLowerCase();
 
             CollectionReference ejerciciosRef = db.collection("workouts").document(workoutId).collection("ejercicios");
             ApiFuture<QuerySnapshot> ejerciciosSnapshot = ejerciciosRef.get();
             List<QueryDocumentSnapshot> ejerciciosDocs = ejerciciosSnapshot.get().getDocuments();
 
             for (QueryDocumentSnapshot ejercicioDoc : ejerciciosDocs) {
-                String nombre = ejercicioDoc.getId();  // ID del ejercicio
-                String descripcion = ejercicioDoc.getString("descripcion"); // Obtener el campo "descripcion"
-                listaEjercicios.add(new Ejercicio(nombre, descripcion));
+                String nombre = ejercicioDoc.getId();
+                String descripcion = ejercicioDoc.getString("descripcion");
+                
+                Long descanso = ejercicioDoc.getLong("descanso");
+                int tiempoEjercicio = (descanso != null) ? descanso.intValue() : 0;
+                
+                int numSeries = 0;
+
+                CollectionReference seriesRef = ejercicioDoc.getReference().collection("series");
+                ApiFuture<QuerySnapshot> seriesSnapshot = seriesRef.get();
+                List<QueryDocumentSnapshot> seriesDocs = seriesSnapshot.get().getDocuments();
+
+                for (QueryDocumentSnapshot seriesDoc : seriesDocs) {
+                    Long duracion = seriesDoc.getLong("duracion");
+                    if (duracion != null) {
+                        numSeries += duracion.intValue();
+                    }
+                }
+                
+                listaEjercicios.add(new Ejercicio(nombre, descripcion, tiempoEjercicio, numSeries));
             }
         } catch (InterruptedException | ExecutionException e) {
-            System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosDetalles");
+            System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosDescripcion");
             e.printStackTrace();
         } finally {
             conexion.cerrar(db);
@@ -293,9 +309,6 @@ public class Metodos {
 
         return listaEjercicios;
     }
-
-
-
 
     public ArrayList<Integer> mObtenerNiveles() throws IOException {
     	Conexion conexion = new Conexion();

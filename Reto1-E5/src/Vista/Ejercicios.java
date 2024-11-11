@@ -4,7 +4,6 @@ import Modelo.Ejercicio;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import java.awt.Font;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -58,11 +57,6 @@ public class Ejercicios extends JPanel {
         descripcionLabel.setBounds(283, 43, 600, 25);
         add(descripcionLabel);
 
-        JButton siguienteButton = new JButton("Siguiente ejercicio");
-        siguienteButton.setBounds(309, 120, 151, 30);
-        siguienteButton.setEnabled(false); // Desactivar el botón "Siguiente" al inicio
-        add(siguienteButton);
-
         JButton iniciarButton = new JButton("Iniciar workout");
         iniciarButton.setBounds(189, 80, 150, 30);
         add(iniciarButton);
@@ -75,42 +69,12 @@ public class Ejercicios extends JPanel {
         JButton salirButton = new JButton("Salir");
         salirButton.setBounds(417, 80, 150, 30);
         add(salirButton);
-
-        if (ejercicios.size() == 1) {
-            siguienteButton.setVisible(false);
-        }
-
-        siguienteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int respuesta = JOptionPane.showConfirmDialog(
-                    Ejercicios.this,
-                    "¿Has completado el ejercicio \"" + ejercicios.get(currentIndex).getNombre() + "\"?",
-                    "Confirmar Ejercicio Completado",
-                    JOptionPane.YES_NO_OPTION
-                );
-
-                if (respuesta == JOptionPane.YES_OPTION) {
-                    ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
-
-                    if (currentIndex < ejercicios.size() - 1) {
-                        currentIndex++;
-                        actualizarEjercicio();
-                    }
-
-                    if (currentIndex == ejercicios.size() - 1) {
-                        siguienteButton.setEnabled(false);
-                    }
-                }
-            }
-        });
-
+        
         iniciarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isWorkoutStarted) {
                     isWorkoutStarted = true;
-                    siguienteButton.setEnabled(true);
                     metodos.iniciarCrono(Ejercicios.this);
                     iniciarButton.setText("Pausar workout");
                     iniciarButton.setBackground(Color.RED);
@@ -151,11 +115,6 @@ public class Ejercicios extends JPanel {
             }
         });
 
-    }
-
-    private void actualizarEjercicio() {
-        nombreLabel.setText("Nombre: " + ejercicios.get(currentIndex).getNombre());
-        descripcionLabel.setText("Descripción: " + ejercicios.get(currentIndex).getDescripcion());
     }
 
     private String formatTime(int seconds) {
