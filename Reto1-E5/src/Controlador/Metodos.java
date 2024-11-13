@@ -42,6 +42,7 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.toedter.calendar.JDateChooser;
 
 import Conexion.Conexion;
+import Modelo.Cronometro;
 import Modelo.Ejercicio;
 import Modelo.Workouts;
 import Vista.Ejercicios;
@@ -54,7 +55,8 @@ public class Metodos {
     private static final String usuariosColl = "usuarios";
     private static final String correoField = "correo";
     private static final String contraField = "contrasena";
-	private Timer timer;
+	private Timer timerSerie, timerDesc;
+	private Cronometro timerWorkout, timerEjer;
 
 	public static DocumentReference usuarioReferencia;
 	
@@ -519,59 +521,119 @@ public class Metodos {
     		} catch (IOException e) { e.printStackTrace(); }
         }
 
-        public void iniciarCrono(Ejercicios ejerciciosPanel) {
+        int serieIndex = 0;
+        public void iniciarCrono(Ejercicios ejerciciosPanel, int timerIndex) {
             // Verificamos si el timer ya está configurado; si no, lo configuramos
-            if (timer == null) {
-                timer = new Timer(1000, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (ejerciciosPanel.getTiempoInicial() > 0) {
-                            ejerciciosPanel.decrementarTiempoInicial();
-                            ejerciciosPanel.updateTimerLabel();
-                        } else {
-                            detenerCrono(); // Detenemos el cronómetro cuando llegue a 0
-                            JOptionPane.showMessageDialog(null, "¡Tiempo completado para el workout!", "Tiempo finalizado", JOptionPane.INFORMATION_MESSAGE);
-                            finalizarWorkout(
-                                ejerciciosPanel.getUser(),
-                                ejerciciosPanel.getWorkoutName(),
-                                ejerciciosPanel.getEjercicios(),
-                                ejerciciosPanel.getEjerciciosRealizados(),
-                                ejerciciosPanel.getTiempoTotalInicial() - ejerciciosPanel.getTiempoInicial(),
-                                ejerciciosPanel.getWorkoutRealizado(),
-                                ejerciciosPanel
-                            );
+        	if (timerIndex == 0 || timerIndex == 1) {
+        		if (timerIndex == 1) serieIndex = 0;
+        		Cronometro crono = (timerIndex == 0 ? timerWorkout : timerEjer);
+        		if (crono == null) {
+        			crono = new Cronometro( timerIndex == 0 ?
+        				new ActionListener() {
+	                        @Override
+	                        public void actionPerformed(ActionEvent e) {
+	                        	ejerciciosPanel.establecerTiempoWorkout(Double.valueOf((int) e.getSource()));
+	                        	ejerciciosPanel.updateWorkoutTimerLabel();
+	                        }
+                		} :
+        				new ActionListener() {
+	                        @Override
+	                        public void actionPerformed(ActionEvent e) {
+	                        	ejerciciosPanel.establecerTiempoEjercicio(Double.valueOf((int) e.getSource()));
+	                        	ejerciciosPanel.updateEjerTimerLabel();
+	                        }
+                    	}
+        			);
+        		}
+        		crono.start();
+        	} else {
+        		Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
+                if (timer == null) {
+                    timer = new Timer(1000, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            if (ejerciciosPanel.getTiempoInicial() > 0) {
+                                ejerciciosPanel.decrementarTiempoInicial();
+                                switch (timerIndex) {
+    	                            case 1: ejerciciosPanel.updateEjerTimerLabel(); break;
+    	                            case 2: ejerciciosPanel.updateDescTimerLabel(); break;
+                                }
+                            } else {
+                                detenerCrono(timerIndex); // Detenemos el cronómetro cuando llegue a 0
+                                JOptionPane.showMessageDialog(null, "¡Tiempo completado para "+(timerIndex == 2 ? "la serie" : "el descanso")+"!", "Tiempo finalizado", JOptionPane.INFORMATION_MESSAGE);
+                                if (timerIndex == 2) {
+                                	Ejercicio current = ejerciciosPanel.getCurrentEjericio();
+                                	if (serieIndex < current.getSeries() - 1) {
+                                    	iniciarCrono(ejerciciosPanel, 3);
+                                	} else if (ejerciciosPanel.esUltimoEjercicio()) {
+                                        finalizarWorkout(
+                                                ejerciciosPanel.getUser(),
+                                                ejerciciosPanel.getWorkoutName(),
+                                                ejerciciosPanel.getEjercicios(),
+                                                ejerciciosPanel.getEjerciciosRealizados(),
+                                                ejerciciosPanel.getTiempoTotalInicial() - ejerciciosPanel.getTiempoInicial(),
+                                                ejerciciosPanel.getWorkoutRealizado(),
+                                                ejerciciosPanel
+                                            );
+                                	}
+                                }
+                            }
                         }
-                    }
-                });
-            }
-            timer.start();
+                    });
+                }
+                timer.start();
+        	}
             ejerciciosPanel.setTimerRunning(true);
         }
 
-        public void pausarCrono() {
-            if (timer != null && timer.isRunning()) {
-                timer.stop();
-            }
+        public void pausarCrono(int timerIndex) {
+        	if (timerIndex == 0)
+        		timerWorkout.pausar();
+        	else if (timerIndex == 1)
+        		timerEjer.pausar();
+        	else {
+            	Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
+                if (timer != null && timer.isRunning()) {
+                    timer.stop();
+                }
+        	}
         }
 
-        public void reanudarCrono(Ejercicios ejerciciosPanel) {
-            if (timer != null && !timer.isRunning()) {
-                timer.start();
+        public void reanudarCrono(Ejercicios ejerciciosPanel, int timerIndex) {
+        	if (timerIndex == 0) {
+        		timerWorkout.reanudar();
                 ejerciciosPanel.setTimerRunning(true);
-            }
+        	} else if (timerIndex == 1) {
+        		timerEjer.reanudar();
+                ejerciciosPanel.setTimerRunning(true);
+        	} else {
+            	Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
+                if (timer != null && !timer.isRunning()) {
+                    timer.start();
+                    ejerciciosPanel.setTimerRunning(true);
+                }
+        	}
         }
 
-        public void detenerCrono() {
-            if (timer != null) {
-                timer.stop();
-                timer = null;
-            }
+        public void detenerCrono(int timerIndex) {
+        	if (timerIndex == 0) {
+        		timerWorkout.detener();
+        	} else {
+            	Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
+                if (timer != null) {
+                    timer.stop();
+                    timer = null;
+                }
+        	}
         }
         
         public void finalizarWorkout(String user, String workoutName, List<Ejercicio> ejercicios, 
-                List<String> ejerciciosRealizados, int tiempoInicial, 
+                List<String> ejerciciosRealizados, double tiempoInicial, 
                 List<Map<String, Object>> workoutRealizado, JPanel panelEjercicios) {
 
+        	timerWorkout.detener();
+        	timerEjer.detener();
+        	
             // Obtener currentIndex utilizando el getter de Ejercicios
             int currentIndex = panelEjercicios instanceof Ejercicios ? ((Ejercicios) panelEjercicios).getCurrentIndex() : 0;
 
@@ -580,14 +642,13 @@ public class Metodos {
                 ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
             }
 
+            double tiempoTotal = timerWorkout.obtenerTiempo();
+            
             // Crear el mapa con los datos del workout
             Map<String, Object> workoutData = new HashMap<>();
             workoutData.put("nombreWorkout", workoutName);
             workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
-            workoutData.put("tiempoTotal", tiempoInicial);
-
-            // Guardar datos del workout realizado
-            guardarDatosWorkout(tiempoInicial, currentIndex, workoutName);
+            workoutData.put("tiempoTotal", tiempoTotal);
             
             // Añadir la información del workout al listado de workouts realizados
             workoutRealizado.add(workoutData);
@@ -598,6 +659,9 @@ public class Metodos {
             int totalEjercicios = ejercicios.size();
             double porcentajeCompletado = ((double) ejerciciosCompletados / totalEjercicios) * 100;
 
+            // Guardar datos del workout realizado
+            guardarDatosWorkout(porcentajeCompletado, tiempoTotal, workoutName);
+            
             // Determinar el mensaje motivacional
             String mensajeMotivacional;
             if (porcentajeCompletado == 100) {
@@ -611,7 +675,7 @@ public class Metodos {
             }
 
             String resumen = String.format("Tiempo total: %02d:%02d\nEjercicios completados: %d de %d\nPorcentaje completado: %.2f%%\n\n%s",
-                    tiempoInicial / 60, tiempoInicial % 60, ejerciciosCompletados, totalEjercicios, porcentajeCompletado, mensajeMotivacional
+            		(int) tiempoTotal / 60, (int) tiempoTotal % 60, ejerciciosCompletados, totalEjercicios, porcentajeCompletado, mensajeMotivacional
                     );
 
             JOptionPane.showMessageDialog(null, resumen, "Resumen del Workout", JOptionPane.INFORMATION_MESSAGE);
