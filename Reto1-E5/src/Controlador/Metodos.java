@@ -28,6 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -44,9 +45,16 @@ import Conexion.Conexion;
 import Modelo.Ejercicio;
 import Modelo.Workouts;
 import Vista.Ejercicios;
+import Vista.Perfil;
 
 
 public class Metodos {
+	private static final String credArchivo = "gymapp.json";
+    private static final String proyectoID = "grupo5-gymapp";
+    private static final String usuariosColl = "usuarios";
+    private static final String correoField = "correo";
+    private static final String contraField = "contrasena";
+	private Timer timer;
 
 	public static DocumentReference usuarioReferencia;
 	
@@ -102,7 +110,6 @@ public class Metodos {
                 }
 
                 if (mostrarWorkout) {
-                    // Panel principal que contendrá el workout y los ejercicios
                     JPanel workoutPanel = new JPanel();
                     workoutPanel.setBorder(BorderFactory.createTitledBorder(workout.getNombre()));
                     workoutPanel.setLayout(new BoxLayout(workoutPanel, BoxLayout.Y_AXIS));
@@ -110,12 +117,10 @@ public class Metodos {
                     JLabel nivelLabel = new JLabel("Nivel: " + workout.getNivel());
                     JLabel videoLabel = new JLabel("Video: " + workout.getVideo());
 
-                    // Obtener los ejercicios de este workout
                     ArrayList<Ejercicio> ejercicios = mObtenerEjerciciosDescripcion(workout.getNombre());
                     JLabel ejerciciosCountLabel = new JLabel("Número de Ejercicios: " + ejercicios.size());
                     workoutPanel.add(ejerciciosCountLabel);
 
-                    // Mostrar los nombres de los ejercicios
                     StringBuilder nombresEjercicios = new StringBuilder("<html>");
                     for (Ejercicio ejercicio : ejercicios) {
                         nombresEjercicios.append(ejercicio.getNombre()).append("<br>");
@@ -124,14 +129,12 @@ public class Metodos {
                     JLabel ejerciciosNamesLabel = new JLabel(nombresEjercicios.toString());
                     workoutPanel.add(ejerciciosNamesLabel);
 
-                    // Listener para abrir el video
                     videoLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
                             abrirVideo(workout.getVideo());
                         }
                     });
 
-                    // Añadimos los elementos de texto al workoutPanel
                     workoutPanel.add(nivelLabel);
                     workoutPanel.add(videoLabel);
 
@@ -140,9 +143,10 @@ public class Metodos {
                     verEjerciciosButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             String nombreWorkout = workout.getNombre();
+                            int tiempoTotalWorkout = workout.getTiempoTotal();
 							
 							// Crear el panel Ejercicios pasando el nombre del workout y la lista de ejercicios
-							Ejercicios ej = new Ejercicios(user, nombreWorkout, ejercicios);
+							Ejercicios ej = new Ejercicios(user, nombreWorkout, ejercicios, tiempoTotalWorkout);
 							ej.setSize(950, 500);
 							ej.setLocation(0, 0);
 
@@ -215,12 +219,16 @@ public class Metodos {
 
                 Long ejercicios = entreno.getLong("numEjercicios");
                 Long nivel = entreno.getLong("nivel");
+                Long tiempoTotal = entreno.getLong("tiempoTotal");
 
                 if (ejercicios != null) {
                     work.setEjercicios(ejercicios.intValue());
                 }
                 if (nivel != null) {
                     work.setNivel(nivel.intValue());
+                }
+                if (tiempoTotal != null) {
+                    work.setTiempoTotal(tiempoTotal.intValue());
                 }
 
                 listaWorkouts.add(work);
@@ -268,20 +276,36 @@ public class Metodos {
         Firestore db = conexion.conectar();
 
         try {
-            // Convertir el nombre del workout a minúsculas para obtener el ID correspondiente
-            String workoutId = workoutNombre.toLowerCase(); 
+            String workoutId = workoutNombre.toLowerCase();
 
             CollectionReference ejerciciosRef = db.collection("workouts").document(workoutId).collection("ejercicios");
             ApiFuture<QuerySnapshot> ejerciciosSnapshot = ejerciciosRef.get();
             List<QueryDocumentSnapshot> ejerciciosDocs = ejerciciosSnapshot.get().getDocuments();
 
             for (QueryDocumentSnapshot ejercicioDoc : ejerciciosDocs) {
-                String nombre = ejercicioDoc.getId();  // ID del ejercicio
-                String descripcion = ejercicioDoc.getString("descripcion"); // Obtener el campo "descripcion"
-                listaEjercicios.add(new Ejercicio(nombre, descripcion));
+                String nombre = ejercicioDoc.getId();
+                String descripcion = ejercicioDoc.getString("descripcion");
+                
+                Long descanso = ejercicioDoc.getLong("descanso");
+                int tiempoEjercicio = (descanso != null) ? descanso.intValue() : 0;
+                
+                int numSeries = 0;
+
+                CollectionReference seriesRef = ejercicioDoc.getReference().collection("series");
+                ApiFuture<QuerySnapshot> seriesSnapshot = seriesRef.get();
+                List<QueryDocumentSnapshot> seriesDocs = seriesSnapshot.get().getDocuments();
+
+                for (QueryDocumentSnapshot seriesDoc : seriesDocs) {
+                    Long duracion = seriesDoc.getLong("duracion");
+                    if (duracion != null) {
+                        numSeries += duracion.intValue();
+                    }
+                }
+                
+                listaEjercicios.add(new Ejercicio(nombre, descripcion, tiempoEjercicio, numSeries));
             }
         } catch (InterruptedException | ExecutionException e) {
-            System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosDetalles");
+            System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosDescripcion");
             e.printStackTrace();
         } finally {
             conexion.cerrar(db);
@@ -289,9 +313,6 @@ public class Metodos {
 
         return listaEjercicios;
     }
-
-
-
 
     public ArrayList<Integer> mObtenerNiveles() throws IOException {
     	Conexion conexion = new Conexion();
@@ -342,11 +363,7 @@ public class Metodos {
     }
     
 
-        private static final String credArchivo = "gymapp.json";
-        private static final String proyectoID = "grupo5-gymapp";
-        private static final String usuariosColl = "usuarios";
-        private static final String correoField = "correo";
-        private static final String contraField = "contrasena";
+        
 
         public QueryDocumentSnapshot iniciarSesion(String correo, String contrasena, JLabel lblError) throws Exception {
             FileInputStream serviceAccount = new FileInputStream(credArchivo);
@@ -501,5 +518,112 @@ public class Metodos {
     			workoutRef.set(data);
     		} catch (IOException e) { e.printStackTrace(); }
         }
+
+        public void iniciarCrono(Ejercicios ejerciciosPanel) {
+            // Verificamos si el timer ya está configurado; si no, lo configuramos
+            if (timer == null) {
+                timer = new Timer(1000, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if (ejerciciosPanel.getTiempoInicial() > 0) {
+                            ejerciciosPanel.decrementarTiempoInicial();
+                            ejerciciosPanel.updateTimerLabel();
+                        } else {
+                            detenerCrono(); // Detenemos el cronómetro cuando llegue a 0
+                            JOptionPane.showMessageDialog(null, "¡Tiempo completado para el workout!", "Tiempo finalizado", JOptionPane.INFORMATION_MESSAGE);
+                            finalizarWorkout(
+                                ejerciciosPanel.getUser(),
+                                ejerciciosPanel.getWorkoutName(),
+                                ejerciciosPanel.getEjercicios(),
+                                ejerciciosPanel.getEjerciciosRealizados(),
+                                ejerciciosPanel.getTiempoTotalInicial() - ejerciciosPanel.getTiempoInicial(),
+                                ejerciciosPanel.getWorkoutRealizado(),
+                                ejerciciosPanel
+                            );
+                        }
+                    }
+                });
+            }
+            timer.start();
+            ejerciciosPanel.setTimerRunning(true);
+        }
+
+        public void pausarCrono() {
+            if (timer != null && timer.isRunning()) {
+                timer.stop();
+            }
+        }
+
+        public void reanudarCrono(Ejercicios ejerciciosPanel) {
+            if (timer != null && !timer.isRunning()) {
+                timer.start();
+                ejerciciosPanel.setTimerRunning(true);
+            }
+        }
+
+        public void detenerCrono() {
+            if (timer != null) {
+                timer.stop();
+                timer = null;
+            }
+        }
+        
+        public void finalizarWorkout(String user, String workoutName, List<Ejercicio> ejercicios, 
+                List<String> ejerciciosRealizados, int tiempoInicial, 
+                List<Map<String, Object>> workoutRealizado, JPanel panelEjercicios) {
+
+            // Obtener currentIndex utilizando el getter de Ejercicios
+            int currentIndex = panelEjercicios instanceof Ejercicios ? ((Ejercicios) panelEjercicios).getCurrentIndex() : 0;
+
+            // Evitar agregar el último ejercicio al final si ya fue agregado
+            if (!ejerciciosRealizados.contains(ejercicios.get(currentIndex).getNombre())) {
+                ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
+            }
+
+            // Crear el mapa con los datos del workout
+            Map<String, Object> workoutData = new HashMap<>();
+            workoutData.put("nombreWorkout", workoutName);
+            workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
+            workoutData.put("tiempoTotal", tiempoInicial);
+
+            // Añadir la información del workout al listado de workouts realizados
+            workoutRealizado.add(workoutData);
+            System.out.println(workoutRealizado);
+
+            // Calcular el porcentaje completado
+            int ejerciciosCompletados = ejerciciosRealizados.size();
+            int totalEjercicios = ejercicios.size();
+            double porcentajeCompletado = ((double) ejerciciosCompletados / totalEjercicios) * 100;
+
+            // Determinar el mensaje motivacional
+            String mensajeMotivacional;
+            if (porcentajeCompletado == 100) {
+                mensajeMotivacional = "¡Felicidades! Completaste todo el workout. ¡Sigue así!";
+            } else if (porcentajeCompletado == 50) {
+                mensajeMotivacional = "¡Buen trabajo! Has completado la mitad del workout.";
+            } else if (porcentajeCompletado > 50) {
+                mensajeMotivacional = "¡Bien hecho! Has completado más de la mitad del workout.";
+            } else {
+                mensajeMotivacional = "No te desanimes, a la próxima lo conseguirás";
+            }
+
+            String resumen = String.format("Tiempo total: %02d:%02d\nEjercicios completados: %d de %d\nPorcentaje completado: %.2f%%\n\n%s",
+                    tiempoInicial / 60, tiempoInicial % 60, ejerciciosCompletados, totalEjercicios, porcentajeCompletado, mensajeMotivacional
+                    );
+
+            JOptionPane.showMessageDialog(null, resumen, "Resumen del Workout", JOptionPane.INFORMATION_MESSAGE);
+
+            Perfil p = new Perfil(user);
+            p.setSize(950, 500);
+            p.setLocation(0, 0);
+
+            panelEjercicios.removeAll();
+            panelEjercicios.add(p, BorderLayout.CENTER);
+            panelEjercicios.revalidate();
+            panelEjercicios.repaint();
+        }
+
+        // Si al hacer ejercicio paso del 1 al 2 y luego vuelvo al 1 me pone que he hecho 3 de 2 ejercicios y el 150%
+        //Arreglar array workoutsRealizado
 
 }

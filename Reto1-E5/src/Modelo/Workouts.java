@@ -27,6 +27,7 @@ public class Workouts implements Serializable {
     private String nombre;
     private int ejercicios;
     private int nivel;
+    private int tiempoTotal;
 
     public Workouts() {
     }
@@ -133,5 +134,13 @@ public class Workouts implements Serializable {
 
         return listaNiveles;
     }
+
+	public int getTiempoTotal() {
+		return tiempoTotal;
+	}
+
+	public void setTiempoTotal(int tiempoTotal) {
+		this.tiempoTotal = tiempoTotal;
+	}
 
 }

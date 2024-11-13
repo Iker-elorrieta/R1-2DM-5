@@ -1,7 +1,7 @@
 package Vista;
 
-import javax.swing.JPanel;
 import Modelo.Ejercicio;
+import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.Timer;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JOptionPane;
+import Controlador.Metodos;
 
 public class Ejercicios extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -26,15 +26,25 @@ public class Ejercicios extends JPanel {
     private JLabel nombreLabel;
     private JLabel descripcionLabel;
     private JLabel timerLabel;
-    private Timer timer;
-    private int elapsedTime = 0;
+    private int tiempoInicial;
+    private int tiempoTotalInicial;
     private boolean isTimerRunning = false;
-    private boolean isWorkoutStarted = false;
+    private boolean isWorkoutStarted = false;  // para verificar si el workout ha comenzado
     private List<String> ejerciciosRealizados = new ArrayList<>();
     private List<Map<String, Object>> workoutRealizado = new ArrayList<>();
+    private Metodos metodos;
 
-    public Ejercicios(String user, String workoutName, List<Ejercicio> ejercicios) {
+    private String user;
+    private String workoutName;
+
+    public Ejercicios(String user, String workoutName, List<Ejercicio> ejercicios, int tiempoTotalWorkout) {
+        this.user = user;
+        this.workoutName = workoutName;
         this.ejercicios = ejercicios;
+        this.tiempoInicial = tiempoTotalWorkout;
+        this.tiempoTotalInicial = tiempoTotalWorkout;
+        this.metodos = new Metodos();
+
         setLayout(null);
 
         JLabel workoutLabel = new JLabel("Workout: " + workoutName);
@@ -52,80 +62,35 @@ public class Ejercicios extends JPanel {
         descripcionLabel.setBounds(283, 43, 600, 25);
         add(descripcionLabel);
 
-        JButton siguienteButton = new JButton("Siguiente");
-        siguienteButton.setBounds(408, 79, 100, 30);
-        add(siguienteButton);
-
-        JButton anteriorButton = new JButton("Anterior");
-        anteriorButton.setBounds(268, 79, 100, 30);
-        anteriorButton.setEnabled(false);
-        add(anteriorButton);
-
         JButton iniciarButton = new JButton("Iniciar workout");
-        iniciarButton.setBounds(310, 120, 150, 30);
+        iniciarButton.setBounds(189, 80, 150, 30);
         add(iniciarButton);
 
-        timerLabel = new JLabel("Tiempo: 00:00");
+        timerLabel = new JLabel("Tiempo: " + formatTime(tiempoInicial));
         timerLabel.setBounds(50, 20, 150, 30);
         timerLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(timerLabel);
 
         JButton salirButton = new JButton("Salir");
-        salirButton.setBounds(310, 160, 150, 30);
+        salirButton.setBounds(417, 80, 150, 30);
         add(salirButton);
-
-        timer = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                elapsedTime++;
-                updateTimerLabel();
-            }
-        });
-
-        siguienteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (currentIndex < ejercicios.size() - 1) {
-                    ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
-                    currentIndex++;
-                    actualizarEjercicio();
-                    anteriorButton.setEnabled(true);
-                }
-                if (currentIndex == ejercicios.size() - 1) {
-                    siguienteButton.setEnabled(false);
-                }
-            }
-        });
-
-        anteriorButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    actualizarEjercicio();
-                    siguienteButton.setEnabled(true);
-                }
-                if (currentIndex == 0) {
-                    anteriorButton.setEnabled(false);
-                }
-            }
-        });
-
+        
         iniciarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isWorkoutStarted) {
                     isWorkoutStarted = true;
-                    iniciarCrono();
+                    metodos.iniciarCrono(Ejercicios.this);
                     iniciarButton.setText("Pausar workout");
                     iniciarButton.setBackground(Color.RED);
                 } else {
                     if (isTimerRunning) {
-                        pausarCrono();
+                        metodos.pausarCrono();
                         iniciarButton.setText("Reanudar workout");
                         iniciarButton.setBackground(Color.GREEN);
+                        isTimerRunning = false;
                     } else {
-                        reanudarCrono();
+                        metodos.reanudarCrono(Ejercicios.this);
                         iniciarButton.setText("Pausar workout");
                         iniciarButton.setBackground(Color.RED);
                     }
@@ -137,7 +102,7 @@ public class Ejercicios extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (isTimerRunning) {
-                    pararCrono();
+                    metodos.detenerCrono();
                 }
                 if (isWorkoutStarted && !ejerciciosRealizados.contains(ejercicios.get(currentIndex).getNombre())) {
                     ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
@@ -161,8 +126,19 @@ public class Ejercicios extends JPanel {
                     mensajeMotivacional = "¡Buen trabajo! Has completado la mitad del workout.";
                 } else if (porcentajeCompletado > 50) {
                     mensajeMotivacional = "¡Bien hecho! Has completado más de la mitad del workout.";
+                
+                if (isWorkoutStarted) {
+                    metodos.finalizarWorkout(user, workoutName, ejercicios, ejerciciosRealizados, tiempoTotalInicial - tiempoInicial, workoutRealizado, Ejercicios.this);
+
                 } else {
-                    mensajeMotivacional = "No te desanimes, a la próxima lo conseguirás";
+                    Perfil p = new Perfil(user);
+                    p.setSize(950, 500);
+                    p.setLocation(0, 0);
+
+                    removeAll();
+                    add(p, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
                 }
 
                 Metodos.guardarDatosWorkout(porcentajeCompletado, elapsedTime, workoutName);
@@ -189,39 +165,55 @@ public class Ejercicios extends JPanel {
             }
         });
 
-        if (ejercicios.size() == 1) {
-            siguienteButton.setEnabled(false);
-        }
     }
 
-    private void iniciarCrono() {
-        timer.start();
-        isTimerRunning = true;
+    private String formatTime(int seconds) {
+        int minutes = seconds / 60;
+        int remainingSeconds = seconds % 60;
+        return String.format("%02d:%02d", minutes, remainingSeconds);
     }
 
-    private void pausarCrono() {
-        timer.stop();
-        isTimerRunning = false;
+    public int getTiempoInicial() {
+        return tiempoInicial;
     }
 
-    private void reanudarCrono() {
-        timer.start();
-        isTimerRunning = true;
+    public void setTimerRunning(boolean running) {
+        this.isTimerRunning = running;
     }
 
-    private void pararCrono() {
-        timer.stop();
-        isTimerRunning = false;
+    public void decrementarTiempoInicial() {
+        tiempoInicial--;
     }
 
-    private void actualizarEjercicio() {
-        nombreLabel.setText("Nombre: " + ejercicios.get(currentIndex).getNombre());
-        descripcionLabel.setText("Descripción: " + ejercicios.get(currentIndex).getDescripcion());
+    public void updateTimerLabel() {
+        timerLabel.setText(formatTime(tiempoInicial));
     }
 
-    private void updateTimerLabel() {
-        int minutes = elapsedTime / 60;
-        int seconds = elapsedTime % 60;
-        timerLabel.setText(String.format("Tiempo: %02d:%02d", minutes, seconds));
+    public int getTiempoTotalInicial() {
+        return tiempoTotalInicial;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getWorkoutName() {
+        return workoutName;
+    }
+    
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public List<Ejercicio> getEjercicios() {
+        return ejercicios;
+    }
+
+    public List<String> getEjerciciosRealizados() {
+        return ejerciciosRealizados;
+    }
+
+    public List<Map<String, Object>> getWorkoutRealizado() {
+        return workoutRealizado;
     }
 }
