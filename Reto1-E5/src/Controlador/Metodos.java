@@ -586,6 +586,9 @@ public class Metodos {
             workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
             workoutData.put("tiempoTotal", tiempoInicial);
 
+            // Guardar datos del workout realizado
+            guardarDatosWorkout(tiempoInicial, currentIndex, workoutName);
+            
             // Añadir la información del workout al listado de workouts realizados
             workoutRealizado.add(workoutData);
             System.out.println(workoutRealizado);
