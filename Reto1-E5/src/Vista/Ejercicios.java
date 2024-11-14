@@ -1,4 +1,5 @@
 package Vista;
+
 import Modelo.Ejercicio;
 import javax.swing.JPanel;
 import javax.swing.JLabel;

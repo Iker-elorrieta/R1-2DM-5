@@ -102,8 +102,13 @@ public class Usuarios implements Serializable {
     public void setNivel(Double nivel) {
         this.nivel = nivel;
     }
+    
 
-    @Override
+    public String getUsuarioscol() {
+		return UsuariosCol;
+	}
+
+	@Override
     public String toString() {
         return "Usuario{" +
                 "correo='" + correo + '\'' +

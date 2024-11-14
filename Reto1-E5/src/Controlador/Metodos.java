@@ -34,7 +34,6 @@ import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -684,66 +683,66 @@ public class Metodos {
                 List<String> ejerciciosRealizados, double tiempoInicial, 
                 List<Map<String, Object>> workoutRealizado, JPanel panelEjercicios) {
 
-    		if (timerWorkout != null) timerWorkout.detener();
-    		if (timerEjer != null) timerEjer.detener();
-        	
-            // Obtener currentIndex utilizando el getter de Ejercicios
-            int currentIndex = panelEjercicios instanceof Ejercicios ? ((Ejercicios) panelEjercicios).getCurrentIndex() : 0;
+        if (timerWorkout != null) timerWorkout.detener();
+        if (timerEjer != null) timerEjer.detener();
 
-            // Evitar agregar el último ejercicio al final si ya fue agregado
-            if (!ejerciciosRealizados.contains(ejercicios.get(currentIndex).getNombre())) {
-                ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
-            }
+        // Obtener currentIndex utilizando el getter de Ejercicios
+        int currentIndex = panelEjercicios instanceof Ejercicios ? ((Ejercicios) panelEjercicios).getCurrentIndex() : 0;
 
-            double tiempoTotal = timerWorkout.obtenerTiempo();
-            
-            // Crear el mapa con los datos del workout
-            Map<String, Object> workoutData = new HashMap<>();
-            workoutData.put("nombreWorkout", workoutName);
-            workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
-            workoutData.put("tiempoTotal", tiempoTotal);
-            
-            // Añadir la información del workout al listado de workouts realizados
-            workoutRealizado.add(workoutData);
-            System.out.println(workoutRealizado);
-
-            // Calcular el porcentaje completado
-            int ejerciciosCompletados = ejerciciosRealizados.size();
-            int totalEjercicios = ejercicios.size();
-            double porcentajeCompletado = ((double) ejerciciosCompletados / totalEjercicios) * 100;
-
-            // Guardar datos del workout realizado
-            guardarDatosWorkout(porcentajeCompletado, tiempoTotal, workoutName);
-            
-            // Determinar el mensaje motivacional
-            String mensajeMotivacional;
-            if (porcentajeCompletado == 100) {
-                mensajeMotivacional = "¡Felicidades! Completaste todo el workout. ¡Sigue así!";
-            } else if (porcentajeCompletado == 50) {
-                mensajeMotivacional = "¡Buen trabajo! Has completado la mitad del workout.";
-            } else if (porcentajeCompletado > 50) {
-                mensajeMotivacional = "¡Bien hecho! Has completado más de la mitad del workout.";
-            } else {
-                mensajeMotivacional = "No te desanimes, a la próxima lo conseguirás";
-            }
-
-            String resumen = String.format("Tiempo total: %02d:%02d\nEjercicios completados: %d de %d\nPorcentaje completado: %.2f%%\n\n%s",
-            		(int) tiempoTotal / 60, (int) tiempoTotal % 60, ejerciciosCompletados, totalEjercicios, porcentajeCompletado, mensajeMotivacional
-                    );
-
-            JOptionPane.showMessageDialog(null, resumen, "Resumen del Workout", JOptionPane.INFORMATION_MESSAGE);
-
-            Perfil p = new Perfil(user);
-            p.setSize(950, 500);
-            p.setLocation(0, 0);
-
-            panelEjercicios.removeAll();
-            panelEjercicios.add(p, BorderLayout.CENTER);
-            panelEjercicios.revalidate();
-            panelEjercicios.repaint();
+        // Asegurarse de que todos los ejercicios realizados estén añadidos
+        if (!ejerciciosRealizados.contains(ejercicios.get(currentIndex).getNombre())) {
+            ejerciciosRealizados.add(ejercicios.get(currentIndex).getNombre());
         }
 
-        // Si al hacer ejercicio paso del 1 al 2 y luego vuelvo al 1 me pone que he hecho 3 de 2 ejercicios y el 150%
-        //Arreglar array workoutsRealizado
+        double tiempoTotal = timerWorkout.obtenerTiempo();
+
+        // Crear el mapa con los datos del workout
+        Map<String, Object> workoutData = new HashMap<>();
+        workoutData.put("nombreWorkout", workoutName);
+        workoutData.put("ejerciciosRealizados", new ArrayList<>(ejerciciosRealizados));
+        workoutData.put("tiempoTotal", tiempoTotal);
+
+        // Añadir la información del workout al listado de workouts realizados
+        workoutRealizado.add(workoutData);
+        System.out.println(workoutRealizado);
+
+        // Calcular el porcentaje completado
+        int ejerciciosCompletados = ejerciciosRealizados.size();
+        int totalEjercicios = ejercicios.size();
+        double porcentajeCompletado = ((double) ejerciciosCompletados / totalEjercicios) * 100;
+
+        // Guardar datos del workout realizado
+        guardarDatosWorkout(porcentajeCompletado, tiempoTotal, workoutName);
+
+        // Determinar el mensaje motivacional
+        String mensajeMotivacional = obtenerMensajeMotivacional(porcentajeCompletado);
+
+        String resumen = String.format("Tiempo total: %02d:%02d\nEjercicios completados: %d de %d\nPorcentaje completado: %.2f%%\n\n%s",
+                (int) tiempoTotal / 60, (int) tiempoTotal % 60, ejerciciosCompletados, totalEjercicios, porcentajeCompletado, mensajeMotivacional
+        );
+
+        JOptionPane.showMessageDialog(null, resumen, "Resumen del Workout", JOptionPane.INFORMATION_MESSAGE);
+
+        Perfil p = new Perfil(user);
+        p.setSize(950, 500);
+        p.setLocation(0, 0);
+
+        panelEjercicios.removeAll();
+        panelEjercicios.add(p, BorderLayout.CENTER);
+        panelEjercicios.revalidate();
+        panelEjercicios.repaint();
+    }
+
+        private String obtenerMensajeMotivacional(double porcentajeCompletado) {
+            if (porcentajeCompletado == 100) {
+                return "¡Felicidades! Completaste todo el workout. ¡Sigue así!";
+            } else if (porcentajeCompletado == 50) {
+                return "¡Buen trabajo! Has completado la mitad del workout.";
+            } else if (porcentajeCompletado > 50) {
+                return "¡Bien hecho! Has completado más de la mitad del workout.";
+            } else {
+                return "No te desanimes, a la próxima lo conseguirás";
+            }
+        }
 
 }

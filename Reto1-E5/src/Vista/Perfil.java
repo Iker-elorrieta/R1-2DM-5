@@ -71,9 +71,22 @@ public class Perfil extends JPanel {
         nivelComboBox.setBounds(428, 412, 85, 25);
         add(nivelComboBox);
         
-        JButton btnVerHistorial = new JButton("Ver Historial");
-        btnVerHistorial.setBounds(627, 412, 204, 25);
-        add(btnVerHistorial);
+        JButton btnHistorico = new JButton("Ver Historial");
+        btnHistorico.setBounds(691, 409, 200, 30);
+        btnHistorico.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Historico historicoPanel = new Historico(user);
+				
+                historicoPanel.setSize(950, 500);
+                historicoPanel.setLocation(0, 0);
+
+                removeAll();
+                add(historicoPanel, BorderLayout.CENTER);
+                revalidate();
+                repaint();
+            }
+        });
+        add(btnHistorico);
         
         JLabel lblFiltrar = new JLabel("Filtrar por nivel: ");
         lblFiltrar.setBounds(318, 417, 100, 14);
