@@ -26,6 +26,7 @@ public class Perfil extends JPanel {
 	
 	private JComboBox<Object> nivelComboBox;
     public JPanel panelWorkouts;
+    
 	public Perfil(String user) {
 		Metodos metodos = new Metodos();
 		
@@ -70,9 +71,22 @@ public class Perfil extends JPanel {
         nivelComboBox.setBounds(428, 412, 85, 25);
         add(nivelComboBox);
         
-        JButton btnVerHistorial = new JButton("Ver Historial");
-        btnVerHistorial.setBounds(627, 412, 204, 25);
-        add(btnVerHistorial);
+        JButton btnHistorico = new JButton("Ver Historial");
+        btnHistorico.setBounds(691, 409, 200, 30);
+        btnHistorico.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Historico historicoPanel = new Historico(user);
+				
+                historicoPanel.setSize(950, 500);
+                historicoPanel.setLocation(0, 0);
+
+                removeAll();
+                add(historicoPanel, BorderLayout.CENTER);
+                revalidate();
+                repaint();
+            }
+        });
+        add(btnHistorico);
         
         JLabel lblFiltrar = new JLabel("Filtrar por nivel: ");
         lblFiltrar.setBounds(318, 417, 100, 14);
@@ -88,12 +102,12 @@ public class Perfil extends JPanel {
                 
 
                 metodos.cargarNiveles(nivelComboBox, panelWorkouts);
-                metodos.mostrarDatosWorkouts(nivelComboBox, panelWorkouts);
+                metodos.mostrarDatosWorkouts(user, nivelComboBox, panelWorkouts);
                 
-                		JLabel lblNewLabel = new JLabel(user);
-                		lblNewLabel.setBounds(20, 30, 166, 40);
+                		JLabel lblNewLabel = new JLabel("Perfil de " + user);
+                		lblNewLabel.setBounds(20, 30, 398, 40);
                 		add(lblNewLabel);
-                		lblNewLabel.setFont(new Font("Arial Black", Font.PLAIN, 28));
+                		lblNewLabel.setFont(new Font("Arial Black", Font.PLAIN, 24));
         
 	}
 }

@@ -84,15 +84,19 @@ public class Login extends JPanel {
 		        
 		        try {
 		            QueryDocumentSnapshot loginUser = metodos.iniciarSesion(correo, contrasena, lblError);
+		            Metodos.usuarioReferencia = loginUser.getReference();
 		            
 		            if (loginUser != null) {
+
+		            	user = loginUser.getString("nombre");
+		            	
 		                try {
 		                    ProcessBuilder builder = new ProcessBuilder("java", "-jar", "CrearBackups.jar");
 		                    builder.start();
 		                } catch (Exception ex) {
 		                    ex.printStackTrace();
 		                }
-
+		                
 		                Perfil w = new Perfil(user);
 		                w.setSize(950, 500);
 		                w.setLocation(0, 0);

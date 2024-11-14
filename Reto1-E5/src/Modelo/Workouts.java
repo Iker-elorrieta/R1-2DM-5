@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -27,6 +28,7 @@ public class Workouts implements Serializable {
     private String nombre;
     private int ejercicios;
     private int nivel;
+    private int tiempoTotal;
 
     public Workouts() {
     }
@@ -107,6 +109,28 @@ public class Workouts implements Serializable {
 
         return listaWorkouts;
     }
+	
+	public DocumentReference mObtenerWorkoutByID(String id) {
+		Firestore co = null;
+		DocumentReference ruta = null;
+		try {
+			Conexion conexion = new Conexion();
+			co = conexion.conectar();
+			ruta = co.collection(WorkoutsCol).document(id);
+			System.out.println(ruta);
+
+			co.close();
+
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return ruta;
+	}
 
     public ArrayList<Integer> mObtenerNiveles() throws IOException {
         ArrayList<Integer> listaNiveles = new ArrayList<>();
@@ -133,5 +157,13 @@ public class Workouts implements Serializable {
 
         return listaNiveles;
     }
+
+	public int getTiempoTotal() {
+		return tiempoTotal;
+	}
+
+	public void setTiempoTotal(int tiempoTotal) {
+		this.tiempoTotal = tiempoTotal;
+	}
 
 }
