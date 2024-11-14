@@ -31,7 +31,6 @@ public class Cronometro extends Thread {
 					if (deci >= 10) {
 						deci = 0;
 						tiempo++;
-						System.out.println(tiempo);
 						onUpdate.actionPerformed(new ActionEvent(tiempo, ActionEvent.ACTION_PERFORMED, "eventoTiempo"));
 					}
 				}

@@ -21,8 +21,8 @@ public class Ejercicios extends JPanel {
     private JLabel nombreLabel;
     private JLabel descripcionLabel;
     private JLabel timerWorkoutLabel, timerEjerLabel, timerDescLabel;
-    private double tiempoInicial;
-    private double tiempoTotalInicial;
+    private double tiempoSerie, tiempoDesc;
+    private double tiempoTotalInicial, tiempoInicial;
     private double tiempoWorkout, tiempoEjercicio;
     private boolean isTimerRunning = false;
     private boolean isWorkoutStarted = false;  // para verificar si el workout ha comenzado
@@ -37,8 +37,10 @@ public class Ejercicios extends JPanel {
         this.user = user;
         this.workoutName = workoutName;
         this.ejercicios = ejercicios;
-        this.tiempoInicial = tiempoTotalWorkout;
+        this.tiempoSerie = ejercicios.get(0).getTiempo();
+        this.tiempoDesc = ejercicios.get(0).getDescanso();
         this.tiempoTotalInicial = tiempoTotalWorkout;
+        this.tiempoInicial = tiempoTotalWorkout;
         this.metodos = new Metodos();
         setLayout(null);
         
@@ -71,12 +73,12 @@ public class Ejercicios extends JPanel {
         timerWorkoutLabel.setFont(new Font("Arial", Font.BOLD, 20));
         add(timerWorkoutLabel);
 
-        timerEjerLabel = new JLabel("Tiempo Ejercicio: " + formatTime(tiempoInicial));
+        timerEjerLabel = new JLabel("Tiempo Ejercicio: " + formatTime(tiempoEjercicio));
         timerEjerLabel.setFont(new Font("Arial", Font.BOLD, 20));
         timerEjerLabel.setBounds(21, 282, 318, 30);
         add(timerEjerLabel);
         
-        timerDescLabel = new JLabel("Tiempo Descanso: " + formatTime(tiempoInicial));
+        timerDescLabel = new JLabel("Tiempo Descanso: " + formatTime(tiempoDesc));
         timerDescLabel.setFont(new Font("Arial", Font.BOLD, 20));
         timerDescLabel.setBounds(21, 323, 318, 30);
         add(timerDescLabel);
@@ -105,6 +107,13 @@ public class Ejercicios extends JPanel {
                     if (currentIndex < ejercicios.size() - 1) {
                         currentIndex++;
                         actualizarEjercicio();
+
+                        metodos.detenerCrono(1);
+                        metodos.iniciarCrono(Ejercicios.this, 1);
+                        
+                        metodos.detenerCrono(2);
+                        metodos.detenerCrono(3);
+                        metodos.iniciarCrono(Ejercicios.this, 2);
                     }
 
                     if (currentIndex == ejercicios.size() - 1) {
@@ -177,15 +186,25 @@ public class Ejercicios extends JPanel {
         return String.format("%02d:%02d", (int) minutes, (int) remainingSeconds);
     }
     
-    public double getTiempoInicial() {
-        return tiempoInicial;
+    public double getTiempoEjer() {
+        return tiempoSerie;
+    }
+
+    public double getTiempoDesc() {
+        return tiempoDesc;
     }
     
     public void setTimerRunning(boolean running) {
         this.isTimerRunning = running;
     }
     
-    public void decrementarTiempoInicial() {
+    public void decrementarTiempoEjer() {
+    	tiempoSerie--;
+        tiempoInicial--;
+    }
+
+    public void decrementarTiempoDesc() {
+        tiempoDesc--;
         tiempoInicial--;
     }
     
@@ -193,7 +212,6 @@ public class Ejercicios extends JPanel {
     	tiempoWorkout = valor;
     }
     
-
     public void establecerTiempoEjercicio(double valor) {
     	tiempoEjercicio = valor;
     }
@@ -207,11 +225,15 @@ public class Ejercicios extends JPanel {
     }
 
     public void updateDescTimerLabel() {
-        timerDescLabel.setText("Tiempo Descanso: " + formatTime(tiempoInicial));
+        timerDescLabel.setText("Tiempo Descanso: " + formatTime(tiempoDesc));
     }
     
     public double getTiempoTotalInicial() {
         return tiempoTotalInicial;
+    }
+
+    public double getTiempoRestante() {
+    	return tiempoTotalInicial - tiempoInicial;
     }
     
     public String getUser() {
@@ -244,5 +266,13 @@ public class Ejercicios extends JPanel {
     
     public List<Map<String, Object>> getWorkoutRealizado() {
         return workoutRealizado;
+    }
+
+    public void reestablecerTiempoSerie() {
+    	tiempoSerie = getCurrentEjericio().getTiempo();
+    }
+
+    public void reestablecerTiempoDescanso() {
+    	tiempoDesc = getCurrentEjericio().getDescanso();
     }
 }

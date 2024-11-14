@@ -3,13 +3,15 @@ package Modelo;
 public class Ejercicio {
     private String nombre;
     private String descripcion;
+    private int descanso;
     private int tiempo;
     private int series;
 
-    public Ejercicio(String nombre, String descripcion, int tiempo, int series) {
+    public Ejercicio(String nombre, String descripcion, int tiempo, int tiempoDesc, int series) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.tiempo = tiempo;
+        this.descanso = tiempoDesc;
         this.series = series;
     }
 
@@ -33,6 +35,13 @@ public class Ejercicio {
     }
     public void setTiempo(int tiempo) {
     	this.tiempo = tiempo;
+    }
+
+    public int getDescanso() {
+    	return descanso;
+    }
+    public void setDescanso(int tiempo) {
+    	this.descanso = tiempo;
     }
 
     public int getSeries() {

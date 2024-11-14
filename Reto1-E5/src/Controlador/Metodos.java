@@ -288,23 +288,19 @@ public class Metodos {
                 String nombre = ejercicioDoc.getId();
                 String descripcion = ejercicioDoc.getString("descripcion");
                 
+                Long tiempo = ejercicioDoc.getLong("duracion");
+                int tiempoEjercicio = (tiempo != null) ? tiempo.intValue() : 0;
+
                 Long descanso = ejercicioDoc.getLong("descanso");
-                int tiempoEjercicio = (descanso != null) ? descanso.intValue() : 0;
-                
-                int numSeries = 0;
+                int tiempoDescanso = (descanso != null) ? descanso.intValue() : 0;
 
                 CollectionReference seriesRef = ejercicioDoc.getReference().collection("series");
                 ApiFuture<QuerySnapshot> seriesSnapshot = seriesRef.get();
                 List<QueryDocumentSnapshot> seriesDocs = seriesSnapshot.get().getDocuments();
 
-                for (QueryDocumentSnapshot seriesDoc : seriesDocs) {
-                    Long duracion = seriesDoc.getLong("duracion");
-                    if (duracion != null) {
-                        numSeries += duracion.intValue();
-                    }
-                }
+                int numSeries = seriesDocs.size();
                 
-                listaEjercicios.add(new Ejercicio(nombre, descripcion, tiempoEjercicio, numSeries));
+                listaEjercicios.add(new Ejercicio(nombre, descripcion, tiempoEjercicio, tiempoDescanso, numSeries));
             }
         } catch (InterruptedException | ExecutionException e) {
             System.out.println("Error: Clase Workouts, metodo mObtenerEjerciciosDescripcion");
@@ -522,13 +518,16 @@ public class Metodos {
         }
 
         int serieIndex = 0;
+        public void reiniciarSerieIndex() {
+        	serieIndex = 0;
+        }
+        
         public void iniciarCrono(Ejercicios ejerciciosPanel, int timerIndex) {
             // Verificamos si el timer ya está configurado; si no, lo configuramos
         	if (timerIndex == 0 || timerIndex == 1) {
         		if (timerIndex == 1) serieIndex = 0;
-        		Cronometro crono = (timerIndex == 0 ? timerWorkout : timerEjer);
-        		if (crono == null) {
-        			crono = new Cronometro( timerIndex == 0 ?
+        		if ((timerIndex == 0 ? timerWorkout : timerEjer) == null) {
+        			Cronometro crono = new Cronometro( timerIndex == 0 ?
         				new ActionListener() {
 	                        @Override
 	                        public void actionPerformed(ActionEvent e) {
@@ -544,86 +543,140 @@ public class Metodos {
 	                        }
                     	}
         			);
+        			if (timerIndex == 0) timerWorkout = crono;
+        			else timerEjer = crono;
         		}
-        		crono.start();
+        		(timerIndex == 0 ? timerWorkout : timerEjer).start();
         	} else {
-        		Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
-                if (timer == null) {
-                    timer = new Timer(1000, new ActionListener() {
+                if ((timerIndex == 2 ? timerSerie : timerDesc) == null) {
+                    Timer timer = new Timer(1000, new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            if (ejerciciosPanel.getTiempoInicial() > 0) {
-                                ejerciciosPanel.decrementarTiempoInicial();
+                            if (timerIndex == 2 ? ejerciciosPanel.getTiempoEjer() > 0 : ejerciciosPanel.getTiempoDesc() > 0) {
                                 switch (timerIndex) {
-    	                            case 1: ejerciciosPanel.updateEjerTimerLabel(); break;
-    	                            case 2: ejerciciosPanel.updateDescTimerLabel(); break;
+    	                            case 2:
+    	                            	ejerciciosPanel.decrementarTiempoEjer();
+    	                            	ejerciciosPanel.updateEjerTimerLabel();
+    	                            	break;
+    	                            case 3:
+    	                            	ejerciciosPanel.decrementarTiempoDesc();
+    	                            	ejerciciosPanel.updateDescTimerLabel();
+    	                            	break;
                                 }
                             } else {
                                 detenerCrono(timerIndex); // Detenemos el cronómetro cuando llegue a 0
-                                JOptionPane.showMessageDialog(null, "¡Tiempo completado para "+(timerIndex == 2 ? "la serie" : "el descanso")+"!", "Tiempo finalizado", JOptionPane.INFORMATION_MESSAGE);
                                 if (timerIndex == 2) {
                                 	Ejercicio current = ejerciciosPanel.getCurrentEjericio();
+                                	System.out.println("current: "+serieIndex);
+                                	System.out.println(current.getSeries() - 1);
                                 	if (serieIndex < current.getSeries() - 1) {
+                                        JOptionPane.showMessageDialog(null, "¡Tiempo completado para la serie!", "Tiempo finalizado", JOptionPane.INFORMATION_MESSAGE);
                                     	iniciarCrono(ejerciciosPanel, 3);
-                                	} else if (ejerciciosPanel.esUltimoEjercicio()) {
-                                        finalizarWorkout(
-                                                ejerciciosPanel.getUser(),
-                                                ejerciciosPanel.getWorkoutName(),
-                                                ejerciciosPanel.getEjercicios(),
-                                                ejerciciosPanel.getEjerciciosRealizados(),
-                                                ejerciciosPanel.getTiempoTotalInicial() - ejerciciosPanel.getTiempoInicial(),
-                                                ejerciciosPanel.getWorkoutRealizado(),
-                                                ejerciciosPanel
-                                            );
+                                	} else {
+                                        JOptionPane.showMessageDialog(null, "¡Se a finalizado todas las series!", "Ejercicio finalizado", JOptionPane.INFORMATION_MESSAGE);
+                                		if (ejerciciosPanel.esUltimoEjercicio()) {
+	                                        finalizarWorkout(
+	                                                ejerciciosPanel.getUser(),
+	                                                ejerciciosPanel.getWorkoutName(),
+	                                                ejerciciosPanel.getEjercicios(),
+	                                                ejerciciosPanel.getEjerciciosRealizados(),
+	                                                ejerciciosPanel.getTiempoRestante(),
+	                                                ejerciciosPanel.getWorkoutRealizado(),
+	                                                ejerciciosPanel
+	                                            );
+                                    	}
                                 	}
+                                } else if (timerIndex == 3) {
+                                    JOptionPane.showMessageDialog(null, "¡El descanso a finalizado!", "Tiempo finalizado", JOptionPane.INFORMATION_MESSAGE);
+                                	serieIndex++;
+                                	ejerciciosPanel.reestablecerTiempoSerie();
+                                	ejerciciosPanel.reestablecerTiempoDescanso();
+	                            	ejerciciosPanel.updateDescTimerLabel();
+                                	iniciarCrono(ejerciciosPanel, 2);
                                 }
                             }
                         }
                     });
+                    if (timerIndex == 2) timerSerie = timer;
+                    else timerDesc = timer;
                 }
-                timer.start();
+                if (timerIndex == 2) timerSerie.start();
+                else timerDesc.start();
         	}
             ejerciciosPanel.setTimerRunning(true);
         }
 
         public void pausarCrono(int timerIndex) {
-        	if (timerIndex == 0)
-        		timerWorkout.pausar();
-        	else if (timerIndex == 1)
-        		timerEjer.pausar();
-        	else {
-            	Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
-                if (timer != null && timer.isRunning()) {
-                    timer.stop();
-                }
+        	switch (timerIndex) {
+	        	case 0:
+	        		timerWorkout.pausar();
+	        		break;
+	        	case 1:
+	        		timerEjer.pausar();
+	        		break;
+	        	case 2:
+	        		if (timerSerie != null && timerSerie.isRunning()) {
+	        			timerSerie.stop();
+	                }
+	        		break;
+	        	case 3:
+	        		if (timerDesc != null && timerDesc.isRunning()) {
+	        			timerDesc.stop();
+	                }
+	        		break;
         	}
         }
 
         public void reanudarCrono(Ejercicios ejerciciosPanel, int timerIndex) {
-        	if (timerIndex == 0) {
-        		timerWorkout.reanudar();
-                ejerciciosPanel.setTimerRunning(true);
-        	} else if (timerIndex == 1) {
-        		timerEjer.reanudar();
-                ejerciciosPanel.setTimerRunning(true);
-        	} else {
-            	Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
-                if (timer != null && !timer.isRunning()) {
-                    timer.start();
-                    ejerciciosPanel.setTimerRunning(true);
-                }
+        	switch (timerIndex) {
+	        	case 0:
+	        		timerWorkout.reanudar();
+	                ejerciciosPanel.setTimerRunning(true);
+	        		break;
+	        	case 1:
+	        		timerEjer.reanudar();
+	                ejerciciosPanel.setTimerRunning(true);
+	        		break;
+	        	case 2:
+	        		if (timerSerie != null && !timerSerie.isRunning()) {
+	        			timerSerie.start();
+	                    ejerciciosPanel.setTimerRunning(true);
+	                }
+	        		break;
+	        	case 3:
+	        		if (timerDesc != null && !timerDesc.isRunning()) {
+	        			timerDesc.start();
+	                    ejerciciosPanel.setTimerRunning(true);
+	                }
+	        		break;
         	}
         }
 
         public void detenerCrono(int timerIndex) {
-        	if (timerIndex == 0) {
-        		timerWorkout.detener();
-        	} else {
-            	Timer timer = (timerIndex == 2 ? timerSerie : timerDesc);
-                if (timer != null) {
-                    timer.stop();
-                    timer = null;
-                }
+        	switch (timerIndex) {
+	        	case 0:
+	        		if (timerWorkout != null) {
+	        			timerWorkout.detener();
+	        		}
+	        		break;
+	        	case 1:
+	        		if (timerEjer != null) {
+	        			timerEjer.detener();
+	        			timerEjer = null;
+	        		}
+	        		break;
+	        	case 2:
+	                if (timerSerie != null) {
+	                	timerSerie.stop();
+	                    timerSerie = null;
+	                }
+	        		break;
+	        	case 3:
+	                if (timerDesc != null) {
+	                	timerDesc.stop();
+	                	timerDesc = null;
+	                }
+	        		break;
         	}
         }
         
@@ -631,8 +684,8 @@ public class Metodos {
                 List<String> ejerciciosRealizados, double tiempoInicial, 
                 List<Map<String, Object>> workoutRealizado, JPanel panelEjercicios) {
 
-        	timerWorkout.detener();
-        	timerEjer.detener();
+    		if (timerWorkout != null) timerWorkout.detener();
+    		if (timerEjer != null) timerEjer.detener();
         	
             // Obtener currentIndex utilizando el getter de Ejercicios
             int currentIndex = panelEjercicios instanceof Ejercicios ? ((Ejercicios) panelEjercicios).getCurrentIndex() : 0;
